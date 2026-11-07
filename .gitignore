@@ -1,0 +1,17 @@
+node_modules/
+out/
+dist/
+prompts-out/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+public/tiles/
+public/fonts/
+public/ref/
+public/planets/
+public/sky/
+public/audio/*.wav
+public/audio/music.mp3
+public/audio/voice.wav

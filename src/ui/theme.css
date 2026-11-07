@@ -1,0 +1,67 @@
+:root {
+  color-scheme: dark;
+  --paper: #05060a;
+  --sheet: #0a0c13;
+  --raised: #10131c;
+  --sunken: #03040a;
+  --rule: #222329;
+  --rule-2: #413f3d;
+  --ink: #ece6d5;
+  --ink-2: #bdb8a8;
+  --ink-3: #8e8a7c;
+  --faint: #625f55;
+  --accent: #f2a244;
+  --accent-ink: #f7bd73;
+  --accent-deep: #b8651a;
+  --teal: #79c7d6;
+  --violet: #c8a6ff;
+  --flag: #ff5a47;
+  --frame-a: #f2a244;
+  --frame-b: #5fc8ff;
+  --good: #7fd8a0;
+  --warn: #f2c04a;
+  --font-serif: "CMU Serif", "Latin Modern Roman", "Computer Modern", "Times New Roman", Georgia, serif;
+  --font-mono: "CMU Typewriter Text", "Latin Modern Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+.film-root {
+  font-family: var(--font-serif);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.5;
+  font-variant-numeric: lining-nums tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.film-root *,
+.film-root *::before,
+.film-root *::after {
+  box-sizing: border-box;
+}
+.film-app-layer,
+.film-app-layer * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.film-root code,
+.film-root pre,
+.film-root kbd,
+.film-root samp {
+  font-family: var(--font-mono);
+}
+.smcp {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.display {
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 1.04;
+}
+.hatch-bad {
+  background-image: repeating-linear-gradient(135deg, transparent 0 5px, rgba(255, 90, 71, 0.16) 5px 6px);
+}
+.hatch-nodata {
+  background-image: repeating-linear-gradient(135deg, transparent 0 5px, rgba(236, 230, 213, 0.1) 5px 6px);
+}

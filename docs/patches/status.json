@@ -1,0 +1,32 @@
+{
+  "00": {
+    "state": "done",
+    "note": "starter repo",
+    "date": "2026-11-08"
+  },
+  "01": {
+    "state": "done",
+    "note": "assets fetched, pair confirmed by re-implementing bestPair",
+    "date": "2026-11-08"
+  },
+  "02": {
+    "state": "done",
+    "note": "HookField and Mark",
+    "date": "2026-11-08"
+  },
+  "03": {
+    "state": "done",
+    "note": "ParallaxDiagram and LimitsCard",
+    "date": "2026-11-08"
+  },
+  "04": {
+    "state": "done",
+    "note": "audio engine",
+    "date": "2026-11-08"
+  },
+  "05": {
+    "state": "done",
+    "note": "render and check-stills; cut30 untested",
+    "date": "2026-11-08"
+  }
+}

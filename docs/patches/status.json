@@ -1,4 +1,16 @@
 {
+  "21": {
+    "state": "done",
+    "owner": "",
+    "note": "S8 Limits scene",
+    "at": "2026-11-08"
+  },
+  "22": {
+    "state": "done",
+    "owner": "",
+    "note": "S9 Outro scene",
+    "at": "2026-11-08"
+  },
   "00": {
     "state": "done",
     "note": "starter repo",

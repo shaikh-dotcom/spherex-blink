@@ -18,6 +18,7 @@ Single source of truth for how the work is going. Every session reads this file 
 - Scenes can be written while UI patches are unfinished by coding against the slice table in bible-04; patch 23 reconciles.
 
 Waves (what runs in parallel versus in order):
+
 - Wave 0: 00 (done).
 - Wave 1, all parallel: 01 (human), 02, 03, 04, 05, 06. UI patches 07 to 12 formally need 01 (real tiles for stills) but their code can be written at the same time as 01.
 - Wave 2: 13 (needs 02), 14 (needs 02), 21 (needs 03), 22 (needs 02), then 15 and 16 (need 07, 08, 09), 17 and 20 (need 09, 10), 18 (needs 09, 11), 19 (needs 03, 09, 12).
@@ -42,6 +43,7 @@ See docs/bible/bible-04.md: FilmState slices per UI file, the scene file contrac
 ## Status
 
 <!-- STATUS:BEGIN -->
+
 Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run the command after every state change.
 
 ### Progress
@@ -61,34 +63,34 @@ These can all run at the same time in separate sessions: they need only finished
 
 ### Every patch
 
-| ID | Wave | State | Weight | Needs | Title | Owner / note |
-|----|------|-------|--------|-------|-------|--------------|
-| 00 | 0 | done | 3 | - | Starter repo (scaffold, config, FX toolkit, evidence, contract, tools) | starter repo |
-| 01 | 1 | done | 1 | 00 | Fetch assets: fonts, tiles, reference pictures (human step, no model) | assets fetched, pair confirmed by re-implementing bestPair |
-| 02 | 1 | done | 4 | 00 | Graphics: HookField (S0 star field) and Mark (logo) | HookField and Mark |
-| 03 | 1 | done | 6 | 00 | Graphics: ParallaxDiagram (S6) and LimitsCard (S8) | ParallaxDiagram and LimitsCard |
-| 04 | 1 | done | 6 | 00 | Audio engine: sfx cue list, generator script, FilmAudio | audio engine |
-| 05 | 1 | done | 5 | 00 | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs | render and check-stills; audited, cut30 verified at 900 frames, 4k verified |
-| 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion; audited |
-| 07 | 2 | done | 6 | 00, 01 | UI: Header and TimeBar | Header and TimeBar, stills checked |
-| 08 | 2 | done | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | Rail, stills checked |
-| 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
-| 10 | 2 | done | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked |
-| 11 | 2 | done | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | Context pane: PanelContext, SkyMapCard; stills checked |
-| 12 | 2 | done | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | Planet X pane: PanelPlanetX, PanelOrrery; stills checked |
-| 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
-| 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
-| 15 | 3 | done | 8 | 07, 08, 09 | Scene S2 Data | Scene S2 Data |
-| 16 | 3 | done | 10 | 07, 08, 09 | Scene S3 Blink | Scene S3 Blink |
-| 17 | 3 | done | 10 | 09, 10 | Scene S4 Inspect | Scene S4 Inspect |
-| 18 | 3 | todo | 8 | 09, 11 | Scene S5 Check | - |
-| 19 | 3 | todo | 12 | 03, 09, 12 | Scene S6 Planet X | - |
-| 20 | 3 | todo | 8 | 09, 10 | Scene S7 Flag | - |
-| 21 | 2 | done | 6 | 03 | Scene S8 Limits | S8 Limits scene |
-| 22 | 2 | done | 3 | 02 | Scene S9 Outro | S9 Outro scene |
-| 23 | 4 | todo | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | - |
-| 24 | 5 | todo | 6 | 04, 23 | Audio sync and mix | - |
-| 25 | 6 | todo | 6 | 05, 06, 24 | Final QA, renders and submission assets | - |
+| ID  | Wave | State | Weight | Needs                                      | Title                                                                  | Owner / note                                                                                                  |
+| --- | ---- | ----- | ------ | ------------------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 00  | 0    | done  | 3      | -                                          | Starter repo (scaffold, config, FX toolkit, evidence, contract, tools) | starter repo                                                                                                  |
+| 01  | 1    | done  | 1      | 00                                         | Fetch assets: fonts, tiles, reference pictures (human step, no model)  | assets fetched, pair confirmed by re-implementing bestPair                                                    |
+| 02  | 1    | done  | 4      | 00                                         | Graphics: HookField (S0 star field) and Mark (logo)                    | HookField and Mark                                                                                            |
+| 03  | 1    | done  | 6      | 00                                         | Graphics: ParallaxDiagram (S6) and LimitsCard (S8)                     | ParallaxDiagram and LimitsCard                                                                                |
+| 04  | 1    | done  | 6      | 00                                         | Audio engine: sfx cue list, generator script, FilmAudio                | audio engine                                                                                                  |
+| 05  | 1    | done  | 5      | 00                                         | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs  | render and check-stills; audited, cut30 verified at 900 frames, 4k verified                                   |
+| 06  | 1    | done  | 5      | 00                                         | Tooling: contact sheets and motion audit                               | make-sheets and audit-motion; audited                                                                         |
+| 07  | 2    | done  | 6      | 00, 01                                     | UI: Header and TimeBar                                                 | Header and TimeBar, stills checked                                                                            |
+| 08  | 2    | done  | 6      | 00, 01                                     | UI: Rail (band plates, Blink controls, Layers, Keys)                   | Rail, stills checked                                                                                          |
+| 09  | 2    | done  | 10     | 00, 01                                     | UI: SkyViewer (blink canvas, overlays, selection, Planet X track)      | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
+| 10  | 2    | done  | 10     | 00, 01                                     | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags)                 | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked                                             |
+| 11  | 2    | done  | 8      | 00, 01                                     | UI: Context pane (PanelContext, SkyMapCard)                            | Context pane: PanelContext, SkyMapCard; stills checked                                                        |
+| 12  | 2    | done  | 10     | 00, 01                                     | UI: Planet X pane (PanelPlanetX, PanelOrrery)                          | Planet X pane: PanelPlanetX, PanelOrrery; stills checked                                                      |
+| 13  | 2    | done  | 5      | 02                                         | Scene S0 Hook                                                          | S0 Hook scene                                                                                                 |
+| 14  | 2    | done  | 3      | 02                                         | Scene S1 Title                                                         | S1 Title scene                                                                                                |
+| 15  | 3    | done  | 8      | 07, 08, 09                                 | Scene S2 Data                                                          | Scene S2 Data                                                                                                 |
+| 16  | 3    | done  | 10     | 07, 08, 09                                 | Scene S3 Blink                                                         | Scene S3 Blink                                                                                                |
+| 17  | 3    | done  | 10     | 09, 10                                     | Scene S4 Inspect                                                       | Scene S4 Inspect                                                                                              |
+| 18  | 3    | todo  | 8      | 09, 11                                     | Scene S5 Check                                                         | -                                                                                                             |
+| 19  | 3    | todo  | 12     | 03, 09, 12                                 | Scene S6 Planet X                                                      | -                                                                                                             |
+| 20  | 3    | todo  | 8      | 09, 10                                     | Scene S7 Flag                                                          | -                                                                                                             |
+| 21  | 2    | done  | 6      | 03                                         | Scene S8 Limits                                                        | S8 Limits scene                                                                                               |
+| 22  | 2    | done  | 3      | 02                                         | Scene S9 Outro                                                         | S9 Outro scene                                                                                                |
+| 23  | 4    | todo  | 8      | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean)                | -                                                                                                             |
+| 24  | 5    | todo  | 6      | 04, 23                                     | Audio sync and mix                                                     | -                                                                                                             |
+| 25  | 6    | todo  | 6      | 05, 06, 24                                 | Final QA, renders and submission assets                                | -                                                                                                             |
 
 ### Waves: what runs in parallel and what runs in order
 
@@ -146,7 +148,7 @@ A wave number is only the earliest wave a patch could run in. A patch may start 
 No ownership conflicts: every file or folder below is written by exactly one patch.
 
 - 00: (the starter zip)
-- 01: public/*
+- 01: public/\*
 - 02: src/gfx/HookField.tsx, src/gfx/Mark.tsx, src/dev/sheets/DevGfxHook.tsx
 - 03: src/gfx/ParallaxDiagram.tsx, src/gfx/LimitsCard.tsx, src/dev/sheets/DevGfxExplain.tsx
 - 04: src/config/sfx.ts, src/audio/FilmAudio.tsx, scripts/make-sfx.mjs
@@ -154,7 +156,7 @@ No ownership conflicts: every file or folder below is written by exactly one pat
 - 06: scripts/make-sheets.mjs, tools/audit-motion.mjs
 - 07: src/ui/Header.tsx, src/ui/TimeBar.tsx, src/dev/sheets/DevHeaderTime.tsx
 - 08: src/ui/Rail.tsx, src/dev/sheets/DevRail.tsx
-- 09: src/ui/SkyViewer.tsx, src/ui/viewer/*, src/dev/sheets/DevSkyViewer.tsx
+- 09: src/ui/SkyViewer.tsx, src/ui/viewer/\*, src/dev/sheets/DevSkyViewer.tsx
 - 10: src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx
 - 11: src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx
 - 12: src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx
@@ -170,7 +172,7 @@ No ownership conflicts: every file or folder below is written by exactly one pat
 - 22: src/scenes/S9Outro.tsx
 - 23: src/config/timeline.ts, src/config/copy.ts, src/config/focus.ts, src/config/theme.ts, src/config/filmState.ts, src/scenes/index.ts, src/SpherexFilm.tsx
 - 24: docs/bible/bible-09.md
-- 25: docs/submission/*, out/*
+- 25: docs/submission/_, out/_
 <!-- STATUS:END -->
 
 ## Handoff entries
@@ -179,7 +181,7 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 
 ### PATCH 00 (starter) - done
 
-- Files: package.json, tsconfig.json, remotion.config.ts, src/config/*, src/data/*, src/fx/*, src/lib/*, src/ui/* (stubs plus FilmApp, theme.css), src/gfx/* (stubs), src/scenes/* (stubs plus index.ts), src/dev/*, scripts/capture-evidence.mjs, scripts/validate-evidence.mjs, scripts/fetch-assets.mjs, tools/*, docs/*.
+- Files: package.json, tsconfig.json, remotion.config.ts, src/config/_, src/data/_, src/fx/_, src/lib/_, src/ui/_ (stubs plus FilmApp, theme.css), src/gfx/_ (stubs), src/scenes/_ (stubs plus index.ts), src/dev/_, scripts/capture-evidence.mjs, scripts/validate-evidence.mjs, scripts/fetch-assets.mjs, tools/_, docs/_.
 - State: `npx tsc --noEmit` is clean; `remotion still` renders the dashed focus map with stub scenes.
 - Evidence: real capture from spherex-blink commit f525fd5be8ccfb3a929337d0add8c1be287bdde6 (sample false). The pair (2025-10-07_2337 to 2025-10-09_0811, band D1, 1.357 days) was chosen by rule: confirm it with the live app's Best pair (patch 01).
 - Public API: each UI stub exports `XState`, `X_DEFAULT`, `X`; each scene stub exports `SN_CAMERA`, `SN_CURSOR`, `SN_STATE` and its overlay; gfx stubs keep the props listed in patches 02 and 03.
@@ -397,3 +399,16 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Checked: `npx tsc --noEmit` clean; stills at f1680, 1706, 1712, 1745, 1768, 1772, 1800, 1806, 1830, 1895, 1905, 1950, 2025, 2090, 2102, 2130, 2219 pass check-stills and the key ones were looked at (untick with callout and no ring or track, click with the crosshair on the dot, snap with the card revealed beside it, the verdict close-up with the app's own wording, zoom-out, re-tick with ring, track and label back, final hold). Stills were rendered without audio files (`npm run sfx` not run).
 - Deviations: (1) the untick, the snap with the card reveal, and the re-tick use whole-window shots (fullWindow, scale 1.16 to 1.19) instead of `figure` or a tight `skyImage` framing: the Known objects tick box sits in the rail, which a figure or skyImage framing crops out, and the snap and the card reveal land on the same beat so they need to be in one frame; the last shot stays wide to f2219 for the same reason. (2) The known layer comes back in one frame at f2100: the viewer has no draw-on progress, so "the layer draws itself" is a hard appearance with the caption and the ticking cursor. (3) The captions sit over the app's figure caption, as in S2 and S3.
 - Requests for shared files: none to edit. For patch 23 to judge: (1) add a `knownReveal` field (0 to 1) to the viewer slice and have Overlay draw the ring, track and label progressively, so the re-tick can draw the layer on; (2) a dedicated focus rect for the Known objects tick box would replace the offsets derived from `layers` in this file.
+
+### PATCH 20 (Scene S7 Flag) - done
+
+- File: src/scenes/S7Flag.tsx (replaces the stub; exports exactly S7_CAMERA, S7_CURSOR, S7_STATE, S7Flag).
+- Camera (every move 24 frames or longer, longest hold 1 frame, max zoom 1.94, max pan 82.1 px per frame): fullWindow 1.16 at f3420 (36 frame move from the S6 exit pose), push to 1.19 over f3456-3479; flagForm 1.8 at f3480 (36 frames), push to 1.86 over f3516-3539; flagList 1.8 at f3540 (36 frames), push to 1.88 over f3576-3659, then to 1.94 over f3660-3779. `bias()` throws above 2.0. `node tools/audit-motion.mjs --scene S7` passes (0 failures, 0 warnings); the full audit now fails only on the S5 and S6 stubs.
+- Cue frames used: CUES.s7.caption 3420 (s7.caption, out at 3495), calloutCross 3480 (variant ok, aimed at the left edge of the match note, side left, lead 110, out at 3540), captionExport 3540 (out at 3650), captionState 3660 (out at 3770). Other frames: flags.formReveal f3450-3480, cursor click f3474, flags.flagged 1 from f3478, matchReveal f3480-3510, exportReveal f3540-3570, exportPulse two 24 frame bumps starting f3558 and f3588, statePulse two 24 frame bumps starting f3690 and f3720.
+- Slice fields set every frame: appOpacity 1; header fieldId "pallas", badge "real"; rail fieldId "pallas", band = pair band (D1), mode "static", rateHz 3, showKnown true, showMask true, hot null; viewer fieldId "pallas", pairA and pairB from selectPair, blinkPhase 0, zoom 1, cx and cy 0.5, selection = the pick centroid for the whole scene, overlayAB false, view "sky", refBlend 0, pxDrawAu null, markA and markB null, reveal 1, coach false; time fieldId "pallas", position 0, epochSeg null, reveal 1; tabs tab "inspect", reveal 1; inspect reveal 1, verdict "moves", verdictReveal 1; flags category "asteroid" (looked up in selectFlagCategories, throws if missing), formReveal, flagged, matchReveal, exportReveal, exportPulse, statePulse as above.
+- Entry state: tabs.tab "inspect" set in the first frame, viewer.fieldId "pallas", selection = the pick, zoom 1, inspect card already revealed. Exit state held from f3540 to f3779: tabs.tab "inspect", flags.flagged 1, matchReveal 1, exportReveal 1, pulses 0.
+- Cursor: fades in to f3438 near the selection in the viewer, travels in an eased arc to the Flag it button and clicks at f3474 (flags.flagged 1 at f3478, a 4 frame lead), moves aside at f3500 so it clears the callout chip, hides at f3516. The button position comes from the panel focus rect and INSPECT_SPLIT (centre x of the panel, INSPECT_SPLIT + 85.5); the match note anchor is panel.x + 26, INSPECT_SPLIT + 166.5. Both offsets were measured from a headless render of PanelFlags.
+- Wording on screen is the app's own: pill "saved in this browser only", status "Saved in this browser (no shared store is configured).", the match note with "(1″ away)", the CSV header from selectFlagColumns and the one row from the pick. Nothing says flags are shared.
+- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; stills at f3420, 3450, 3470, 3474, 3478, 3486, 3510, 3540, 3558, 3600, 3660, 3696, 3726, 3770, 3779 pass check-stills; the key ones were looked at (form about to reveal in the wide shot, cursor on Flag it at the click, callout with the match note and status line, export buttons pulsing with the CSV strip, pill ring pulse with a clean caption, final hold). Stills were rendered without audio files (`npm run sfx` not run).
+- Deviations: (1) the click is at f3474 and the flag lands at f3478 (4 frame lead from motion rule 11) where the patch text said click f3475. (2) The last shot (f3660-3779) stays on flagList instead of pushing onto flagForm: with the form centred, the Export buttons and the CSV strip sit under the lower-third caption; framed on flagList the pill and status line are in the upper half and the caption sits on clear ground. (3) The "Flag it." caption sits over the app's figure caption in the wide shot, as in S2 to S4.
+- Requests for shared files: none to edit. For patch 23 to judge: (1) src/config/focus.ts flagForm and flagList rects are the ones patch 10 already asked to correct; S7 sets absolute camera scales through `bias()`, so correcting the rects keeps the scales and moves the centres by about 12 logical px. (2) S8_CURSOR starts with a waypoint `hide: true` at f3780; after S7 hides the cursor at f3516 the cursor logic fades it in at the window centre over f3772-3780 and out again, so drop that waypoint or give S8 no cursor waypoints.

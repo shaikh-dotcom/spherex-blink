@@ -46,20 +46,20 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **50%** by effort weight (87 of 173 units; 0 more in progress)
-- Patches: 16 done, 0 in progress, 0 blocked, 10 not started (of 26)
+- Work done: **56%** by effort weight (97 of 173 units; 0 more in progress)
+- Patches: 17 done, 0 in progress, 0 blocked, 9 not started (of 26)
 - Film scenes finished: 1320 of 4500 frames (29%)
-- Work left: 86 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work left: 76 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
 - **15** Scene S2 Data (weight 8; owns src/scenes/S2Data.tsx)
 - **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
 - **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
 - **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
+- **19** Scene S6 Planet X (weight 12; owns src/scenes/S6PlanetX.tsx)
 - **20** Scene S7 Flag (weight 8; owns src/scenes/S7Flag.tsx)
 
 ### Every patch
@@ -78,7 +78,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
 | 10 | 2 | done | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked |
 | 11 | 2 | done | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | Context pane: PanelContext, SkyMapCard; stills checked |
-| 12 | 2 | todo | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | - |
+| 12 | 2 | done | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | Planet X pane: PanelPlanetX, PanelOrrery; stills checked |
 | 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
 | 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
 | 15 | 3 | todo | 8 | 07, 08, 09 | Scene S2 Data | - |
@@ -344,3 +344,18 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Focus names occupied: contextField, realityCheck, referenceBlend, skyMapCard.
 - Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevContext stills at validationReveal 0, 0.5 and 1, with the across and strict stages, referenceBlend 0 and 0.6, another reference layer, showKnown true and false, and a half revealed pane: nothing clipped, the strict note ends inside the 260 card.
 - Requests for shared files: (1) src/data/select.ts: add a selector for the reference layers (id, label, credit) from tiles/<field>/ref/ref.json; PanelContext keeps a three-entry table copied from that file because public/sky/credits.json holds only the planet and Milky Way credits.
+
+### PATCH 12 (Planet X pane) - done
+
+- Files: src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx, CSS block `.sb-planetx-begin{}` at the end of src/ui/theme.css.
+- Public API: `PanelPlanetX`, `PLANETX_DEFAULT`, `PanelPlanetXState`, `FitKind`; `PanelOrrery`, `ORRERY_DEFAULT`, `PanelOrreryState`.
+- Layout: both components position themselves absolutely at their focus rects. PanelPlanetX is one box, the union of `pxLab` and `pxMeasure` (y 130 to 630, h 500); PanelOrrery fills `orreryCard` (y 640, h 250). The lab text is tightened (12 to 14.5 px type, 12 px notes) so the longest fit wording ("still", 4 lines) ends inside the 500 px box; the A and B timestamps share one row and the six-month cell puts its label and value on one line.
+- PanelPlanetXState slice (final): `distanceAu: number` (500; the slider readout prints it rounded to 10, the output lines use the nearest of the 8 table rows through selectShift), `outReveal: number` (0; fades the output block), `measureReveal: number` (0; fades the Measure a mover block), `fitReveal: number` (0; fades and lifts the fit verdict), ADDED `reveal: number` (1; fades the whole lab), ADDED `sixReveal: number` (1; fades the violet six-month cell and its sentence), ADDED `marks: number` (2; 0, 1 or 2 marks set, fractions cross-fade the hint and the numbers), ADDED `markPulse: number` (0; amber ring on Mark A while marks is 0 or 1, on Mark B when marks is 2), ADDED `fitKind: null | "still" | "near" | "distant" | "misfit"` (null uses pair.fit.kind from the evidence, the others override it for dev sheets).
+- PanelOrreryState slice (final): `reveal: number` (0; fades the card), `day: number` (0; days after mjd0, clamped to 0..486), `playing: boolean` (false; Play or Pause glyph only), ADDED `dirReveal: number` (1; fades the violet direction line, arrow and label).
+- Wording from the app (motion.js, parallax.js): the output sentence, the error and limit cells, the six-month cell and the 36x sentence, the Pallas rate line, the Mark A and Mark B hint, and the four fit wordings (still, near, distant, misfit). Numbers go through `fmt()` (half-up rounding, like the app: the evidence stores 21.45 and `toFixed(1)` would print 21.4 where the app prints 21.5). Do not replace `fmt` with `toFixed`.
+- Measure block: error is `measuredPair.sigmaArcsec * sqrt 2` (sigmaArcsec is the app's per-axis sigma), the duration comes from the two frames' mjd, the rate is moved over hours. The app's "direction N to E" cell is replaced by the pixel figure in the moved cell (the evidence has no direction). Left out: the app's "Selected: ra, dec" line, its grey error-bar note and the "Draw its track on the sky" checkbox (no room, no selection data; the scene drives `viewer.pxDrawAu`). The "distant" and "misfit" wordings omit the angle sentences because the evidence has no measured or predicted angle.
+- Orrery: radial sqrt scale like the app, orbit trails from the sampled positions (the evidence has no full orbit polylines, so outer planets show only the arc covered by the 487 days), Earth highlighted, violet dashed direction line from `pallas.pick.ecliptic.lon`, labels placed by a port of the app's collision solver with label widths estimated from character classes (no canvas measureText, so it stays deterministic). Planets are interpolated linearly between the 5-day samples (like the app's `at()`), not snapped to a rounded index, to avoid visible stepping; the spec said rounded index. Planet colours are the app's palette kept as a local table in PanelOrrery.tsx (theme.ts has none). The app's table and speed select are left out.
+- Anchors (data-anchor): pxLab, pxDistance, pxOutput, pxSixMonth, pxMeasure, markA, markB, clearMk, pxMoved, pxFit, orreryCard, orrery, orDate, orPlay, orSlider.
+- Focus names occupied: pxLab, pxDistance, pxOutput, pxMeasure, orreryCard.
+- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; all 18 DevPlanetX cases rendered at scale 1: distance 30, 100, 500, 1000 and the 160 to 200 snap, six-month line hidden, measure block empty, Mark A and Mark B pulses, fit reveal 0, 0.5 and 1, the four fit kinds, orrery day 0, 90, 180, 300 (direction line at 0.4) and 486, and the half revealed pane. Nothing is clipped (the 4-line "still" verdict ends inside the lab box) and no orrery labels collide.
+- Requests for shared files: (1) src/config/focus.ts: `pxLab` (y 130, h 460) and `pxMeasure` (y 460, h 170) overlap by 130 px; the pane draws as one box from y 130 to 630, so for aiming callouts set `pxLab` to {y: 130, h: 330} and keep `pxMeasure` at y 460, h 170; `pxOutput` (y 225, h 230) is approximate (the output block runs from about y 215 to 330, the six-month cell sits at about y 270). (2) src/data/select.ts and the evidence: add the full orbit polyline per body (the app's orrery.json has `orbit`) and the measured and predicted angles in `parallax.measuredPair.fit`, so the orrery trails and the "distant" and "misfit" wordings can be complete. The current "distant" evidence prints a range of "25–25 AU", worth checking in the capture.

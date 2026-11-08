@@ -1,0 +1,1204 @@
+diff --git a/HANDOFF.md b/HANDOFF.md
+index 29035ab..a7be500 100644
+--- a/HANDOFF.md
++++ b/HANDOFF.md
+@@ -4,7 +4,7 @@ Deterministic Remotion motion video (1920x1080, 30 fps, 4500 frames = 150 s) for
+ 
+ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status and the handoff entries of finished patches), docs/bible/bible-04.md (frozen contract), then your patch in docs/patches/patch-NN.md. `node tools/make-prompt.mjs NN` builds a ready prompt in prompts-out/.
+ 
+-## 1. Status: 16 of 26 patches done (about 50 percent of the effort, 1320 of 4500 scene frames)
++## 1. Status: 17 of 26 patches done (about 56 percent of the effort, 1320 of 4500 scene frames)
+ 
+ | Patch | What | State |
+ |---|---|---|
+@@ -21,25 +21,25 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
+ | 09 | UI: SkyViewer (tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption) | DONE (tsc clean; DevSkyViewer stills and film frames 598 and 1100 checked; adds slice fields `refLayer` and `coach`) |
+ | 10 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | DONE (tsc clean; DevInspect stills checked; adds flags fields `exportPulse` and `statePulse`; Requests for patch 23 in the ledger: flag rects and panel background) |
+ | 11 | UI: Context pane (PanelContext, SkyMapCard) | DONE (tsc clean; DevContext stills checked; adds context fields `acrossReveal`, `strictReveal`, `refReveal` and `refLayer`, see the ledger) |
+-| 12 | UI: Planet X pane | TODO, can start now |
++| 12 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | DONE (tsc clean; DevPlanetX stills checked; adds planetx fields `reveal`, `sixReveal`, `marks`, `markPulse`, `fitKind` and orrery field `dirReveal`, see the ledger; Requests for patch 23 in the ledger: focus rects and orbit/angle evidence) |
+ | 15, 16 | Scenes S2, S3 | TODO, can start now (07, 08, 09 done) |
+ | 17, 20 | Scenes S4, S7 | TODO, can start now (09, 10 done) |
+ | 18 | Scene S5 | TODO, can start now (09, 11 done) |
+-| 19 | Scene S6 | TODO after 12 (03 and 09 done) |
++| 19 | Scene S6 | TODO, can start now (03, 09, 12 done) |
+ | 23 | Continuity and motion pass | TODO after all scenes and 06 |
+ | 24 | Audio sync and mix | TODO after 04 (done) and 23 |
+ | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
+ 
+-Remaining: 86 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
++Remaining: 76 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
+ 
+-Ready now, all parallel (separate sessions or models): 12, 15, 16, 17, 18, 20. Run `node tools/ledger.mjs next` for the live list.
++Ready now, all parallel (separate sessions or models): 15, 16, 17, 18, 19, 20. Run `node tools/ledger.mjs next` for the live list.
+ 
+ ## 2. What exists
+ 
+ - src/config: theme, timeline (SCENES, CUT_FRAMES, CUES), copy, camera, focus (27 focus rects), filmState (frozen), sfx.
+ - src/data: evidence.json (REAL capture, spherex-blink commit f525fd5), types, select (typed selectors).
+ - src/fx, src/lib: motion toolkit. src/gfx: HookField, Mark, ParallaxDiagram, LimitsCard (finished). src/audio/FilmAudio.tsx (finished).
+-- src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext and SkyMapCard are FINISHED (patch 11). PanelPlanetX and PanelOrrery are STUBS with final exports (`XState`, `X_DEFAULT`, component); FilmApp.tsx is already wired.
++- src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext and SkyMapCard are FINISHED (patch 11). PanelPlanetX and PanelOrrery are FINISHED (patch 12). FilmApp.tsx is already wired.
+ - src/scenes: S0Hook, S1Title, S8Limits and S9Outro are FINISHED (patches 13, 14, 21, 22). S2Data ... S7Flag are STUBS exporting `SN_CAMERA`, `SN_CURSOR`, `SN_STATE` and an overlay; index.ts wires all of them.
+ - scripts: make-sheets (`npm run sheets -- --scene S3 --every 4`), capture-evidence, validate-evidence (`--final`), fetch-assets, make-sfx (`npm run sfx`, `sfx:check`), render (`--4k`, `--frames`, `--cut30`, `--from/--to`, `--browser`), check-stills.
+ - tools: audit-motion.mjs (`npm run motion`, run it after every scene patch), ledger.mjs (`sync|status|next|start|done|block|check`), make-prompt.mjs, lib.mjs, shots.mjs (render named stills of any composition: `node tools/shots.mjs SpherexFilm 300,600 out/shots 0.5 <chrome>`).
+@@ -76,5 +76,5 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
+ ## 6. Next steps for whoever continues
+ 
+ 1. `npm install`, `npm run assets -- --from ../spherex-blink`, `npm run sfx`.
+-2. Run the remaining UI patch 12 (on the critical path) and the scenes S2, S3, S4, S5 and S7 (15, 16, 17, 18, 20), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
+-3. Then scene 19, then 23, 24, 25.
++2. Run the scenes S2, S3, S4, S5, S6 and S7 (15, 16, 17, 18, 19, 20; 19 is on the critical path), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
++3. Then 23, 24, 25.
+diff --git a/docs/HANDOFF.md b/docs/HANDOFF.md
+index 29035ab..a7be500 100644
+--- a/docs/HANDOFF.md
++++ b/docs/HANDOFF.md
+@@ -4,7 +4,7 @@ Deterministic Remotion motion video (1920x1080, 30 fps, 4500 frames = 150 s) for
+ 
+ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status and the handoff entries of finished patches), docs/bible/bible-04.md (frozen contract), then your patch in docs/patches/patch-NN.md. `node tools/make-prompt.mjs NN` builds a ready prompt in prompts-out/.
+ 
+-## 1. Status: 16 of 26 patches done (about 50 percent of the effort, 1320 of 4500 scene frames)
++## 1. Status: 17 of 26 patches done (about 56 percent of the effort, 1320 of 4500 scene frames)
+ 
+ | Patch | What | State |
+ |---|---|---|
+@@ -21,25 +21,25 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
+ | 09 | UI: SkyViewer (tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption) | DONE (tsc clean; DevSkyViewer stills and film frames 598 and 1100 checked; adds slice fields `refLayer` and `coach`) |
+ | 10 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | DONE (tsc clean; DevInspect stills checked; adds flags fields `exportPulse` and `statePulse`; Requests for patch 23 in the ledger: flag rects and panel background) |
+ | 11 | UI: Context pane (PanelContext, SkyMapCard) | DONE (tsc clean; DevContext stills checked; adds context fields `acrossReveal`, `strictReveal`, `refReveal` and `refLayer`, see the ledger) |
+-| 12 | UI: Planet X pane | TODO, can start now |
++| 12 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | DONE (tsc clean; DevPlanetX stills checked; adds planetx fields `reveal`, `sixReveal`, `marks`, `markPulse`, `fitKind` and orrery field `dirReveal`, see the ledger; Requests for patch 23 in the ledger: focus rects and orbit/angle evidence) |
+ | 15, 16 | Scenes S2, S3 | TODO, can start now (07, 08, 09 done) |
+ | 17, 20 | Scenes S4, S7 | TODO, can start now (09, 10 done) |
+ | 18 | Scene S5 | TODO, can start now (09, 11 done) |
+-| 19 | Scene S6 | TODO after 12 (03 and 09 done) |
++| 19 | Scene S6 | TODO, can start now (03, 09, 12 done) |
+ | 23 | Continuity and motion pass | TODO after all scenes and 06 |
+ | 24 | Audio sync and mix | TODO after 04 (done) and 23 |
+ | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
+ 
+-Remaining: 86 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
++Remaining: 76 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
+ 
+-Ready now, all parallel (separate sessions or models): 12, 15, 16, 17, 18, 20. Run `node tools/ledger.mjs next` for the live list.
++Ready now, all parallel (separate sessions or models): 15, 16, 17, 18, 19, 20. Run `node tools/ledger.mjs next` for the live list.
+ 
+ ## 2. What exists
+ 
+ - src/config: theme, timeline (SCENES, CUT_FRAMES, CUES), copy, camera, focus (27 focus rects), filmState (frozen), sfx.
+ - src/data: evidence.json (REAL capture, spherex-blink commit f525fd5), types, select (typed selectors).
+ - src/fx, src/lib: motion toolkit. src/gfx: HookField, Mark, ParallaxDiagram, LimitsCard (finished). src/audio/FilmAudio.tsx (finished).
+-- src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext and SkyMapCard are FINISHED (patch 11). PanelPlanetX and PanelOrrery are STUBS with final exports (`XState`, `X_DEFAULT`, component); FilmApp.tsx is already wired.
++- src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext and SkyMapCard are FINISHED (patch 11). PanelPlanetX and PanelOrrery are FINISHED (patch 12). FilmApp.tsx is already wired.
+ - src/scenes: S0Hook, S1Title, S8Limits and S9Outro are FINISHED (patches 13, 14, 21, 22). S2Data ... S7Flag are STUBS exporting `SN_CAMERA`, `SN_CURSOR`, `SN_STATE` and an overlay; index.ts wires all of them.
+ - scripts: make-sheets (`npm run sheets -- --scene S3 --every 4`), capture-evidence, validate-evidence (`--final`), fetch-assets, make-sfx (`npm run sfx`, `sfx:check`), render (`--4k`, `--frames`, `--cut30`, `--from/--to`, `--browser`), check-stills.
+ - tools: audit-motion.mjs (`npm run motion`, run it after every scene patch), ledger.mjs (`sync|status|next|start|done|block|check`), make-prompt.mjs, lib.mjs, shots.mjs (render named stills of any composition: `node tools/shots.mjs SpherexFilm 300,600 out/shots 0.5 <chrome>`).
+@@ -76,5 +76,5 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
+ ## 6. Next steps for whoever continues
+ 
+ 1. `npm install`, `npm run assets -- --from ../spherex-blink`, `npm run sfx`.
+-2. Run the remaining UI patch 12 (on the critical path) and the scenes S2, S3, S4, S5 and S7 (15, 16, 17, 18, 20), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
+-3. Then scene 19, then 23, 24, 25.
++2. Run the scenes S2, S3, S4, S5, S6 and S7 (15, 16, 17, 18, 19, 20; 19 is on the critical path), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
++3. Then 23, 24, 25.
+diff --git a/docs/LEDGER.md b/docs/LEDGER.md
+index 49db3c2..ffc0871 100644
+--- a/docs/LEDGER.md
++++ b/docs/LEDGER.md
+@@ -46,20 +46,20 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run
+ 
+ ### Progress
+ 
+-- Work done: **50%** by effort weight (87 of 173 units; 0 more in progress)
+-- Patches: 16 done, 0 in progress, 0 blocked, 10 not started (of 26)
++- Work done: **56%** by effort weight (97 of 173 units; 0 more in progress)
++- Patches: 17 done, 0 in progress, 0 blocked, 9 not started (of 26)
+ - Film scenes finished: 1320 of 4500 frames (29%)
+-- Work left: 86 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
++- Work left: 76 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+ 
+ ### Ready now (all needs done, nobody started)
+ 
+ These can all run at the same time in separate sessions: they need only finished patches and they own different files.
+ 
+-- **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
+ - **15** Scene S2 Data (weight 8; owns src/scenes/S2Data.tsx)
+ - **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
+ - **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
+ - **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
++- **19** Scene S6 Planet X (weight 12; owns src/scenes/S6PlanetX.tsx)
+ - **20** Scene S7 Flag (weight 8; owns src/scenes/S7Flag.tsx)
+ 
+ ### Every patch
+@@ -78,7 +78,7 @@ These can all run at the same time in separate sessions: they need only finished
+ | 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
+ | 10 | 2 | done | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked |
+ | 11 | 2 | done | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | Context pane: PanelContext, SkyMapCard; stills checked |
+-| 12 | 2 | todo | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | - |
++| 12 | 2 | done | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | Planet X pane: PanelPlanetX, PanelOrrery; stills checked |
+ | 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
+ | 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
+ | 15 | 3 | todo | 8 | 07, 08, 09 | Scene S2 Data | - |
+@@ -344,3 +344,18 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue
+ - Focus names occupied: contextField, realityCheck, referenceBlend, skyMapCard.
+ - Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevContext stills at validationReveal 0, 0.5 and 1, with the across and strict stages, referenceBlend 0 and 0.6, another reference layer, showKnown true and false, and a half revealed pane: nothing clipped, the strict note ends inside the 260 card.
+ - Requests for shared files: (1) src/data/select.ts: add a selector for the reference layers (id, label, credit) from tiles/<field>/ref/ref.json; PanelContext keeps a three-entry table copied from that file because public/sky/credits.json holds only the planet and Milky Way credits.
++
++### PATCH 12 (Planet X pane) - done
++
++- Files: src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx, CSS block `.sb-planetx-begin{}` at the end of src/ui/theme.css.
++- Public API: `PanelPlanetX`, `PLANETX_DEFAULT`, `PanelPlanetXState`, `FitKind`; `PanelOrrery`, `ORRERY_DEFAULT`, `PanelOrreryState`.
++- Layout: both components position themselves absolutely at their focus rects. PanelPlanetX is one box, the union of `pxLab` and `pxMeasure` (y 130 to 630, h 500); PanelOrrery fills `orreryCard` (y 640, h 250). The lab text is tightened (12 to 14.5 px type, 12 px notes) so the longest fit wording ("still", 4 lines) ends inside the 500 px box; the A and B timestamps share one row and the six-month cell puts its label and value on one line.
++- PanelPlanetXState slice (final): `distanceAu: number` (500; the slider readout prints it rounded to 10, the output lines use the nearest of the 8 table rows through selectShift), `outReveal: number` (0; fades the output block), `measureReveal: number` (0; fades the Measure a mover block), `fitReveal: number` (0; fades and lifts the fit verdict), ADDED `reveal: number` (1; fades the whole lab), ADDED `sixReveal: number` (1; fades the violet six-month cell and its sentence), ADDED `marks: number` (2; 0, 1 or 2 marks set, fractions cross-fade the hint and the numbers), ADDED `markPulse: number` (0; amber ring on Mark A while marks is 0 or 1, on Mark B when marks is 2), ADDED `fitKind: null | "still" | "near" | "distant" | "misfit"` (null uses pair.fit.kind from the evidence, the others override it for dev sheets).
++- PanelOrreryState slice (final): `reveal: number` (0; fades the card), `day: number` (0; days after mjd0, clamped to 0..486), `playing: boolean` (false; Play or Pause glyph only), ADDED `dirReveal: number` (1; fades the violet direction line, arrow and label).
++- Wording from the app (motion.js, parallax.js): the output sentence, the error and limit cells, the six-month cell and the 36x sentence, the Pallas rate line, the Mark A and Mark B hint, and the four fit wordings (still, near, distant, misfit). Numbers go through `fmt()` (half-up rounding, like the app: the evidence stores 21.45 and `toFixed(1)` would print 21.4 where the app prints 21.5). Do not replace `fmt` with `toFixed`.
++- Measure block: error is `measuredPair.sigmaArcsec * sqrt 2` (sigmaArcsec is the app's per-axis sigma), the duration comes from the two frames' mjd, the rate is moved over hours. The app's "direction N to E" cell is replaced by the pixel figure in the moved cell (the evidence has no direction). Left out: the app's "Selected: ra, dec" line, its grey error-bar note and the "Draw its track on the sky" checkbox (no room, no selection data; the scene drives `viewer.pxDrawAu`). The "distant" and "misfit" wordings omit the angle sentences because the evidence has no measured or predicted angle.
++- Orrery: radial sqrt scale like the app, orbit trails from the sampled positions (the evidence has no full orbit polylines, so outer planets show only the arc covered by the 487 days), Earth highlighted, violet dashed direction line from `pallas.pick.ecliptic.lon`, labels placed by a port of the app's collision solver with label widths estimated from character classes (no canvas measureText, so it stays deterministic). Planets are interpolated linearly between the 5-day samples (like the app's `at()`), not snapped to a rounded index, to avoid visible stepping; the spec said rounded index. Planet colours are the app's palette kept as a local table in PanelOrrery.tsx (theme.ts has none). The app's table and speed select are left out.
++- Anchors (data-anchor): pxLab, pxDistance, pxOutput, pxSixMonth, pxMeasure, markA, markB, clearMk, pxMoved, pxFit, orreryCard, orrery, orDate, orPlay, orSlider.
++- Focus names occupied: pxLab, pxDistance, pxOutput, pxMeasure, orreryCard.
++- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; all 18 DevPlanetX cases rendered at scale 1: distance 30, 100, 500, 1000 and the 160 to 200 snap, six-month line hidden, measure block empty, Mark A and Mark B pulses, fit reveal 0, 0.5 and 1, the four fit kinds, orrery day 0, 90, 180, 300 (direction line at 0.4) and 486, and the half revealed pane. Nothing is clipped (the 4-line "still" verdict ends inside the lab box) and no orrery labels collide.
++- Requests for shared files: (1) src/config/focus.ts: `pxLab` (y 130, h 460) and `pxMeasure` (y 460, h 170) overlap by 130 px; the pane draws as one box from y 130 to 630, so for aiming callouts set `pxLab` to {y: 130, h: 330} and keep `pxMeasure` at y 460, h 170; `pxOutput` (y 225, h 230) is approximate (the output block runs from about y 215 to 330, the six-month cell sits at about y 270). (2) src/data/select.ts and the evidence: add the full orbit polyline per body (the app's orrery.json has `orbit`) and the measured and predicted angles in `parallax.measuredPair.fit`, so the orrery trails and the "distant" and "misfit" wordings can be complete. The current "distant" evidence prints a range of "25–25 AU", worth checking in the capture.
+diff --git a/docs/patches/status.json b/docs/patches/status.json
+index 1309b59..85a4112 100644
+--- a/docs/patches/status.json
++++ b/docs/patches/status.json
+@@ -9,6 +9,12 @@
+     "note": "Context pane: PanelContext, SkyMapCard; stills checked",
+     "at": "2026-11-08"
+   },
++  "12": {
++    "state": "done",
++    "owner": "",
++    "note": "Planet X pane: PanelPlanetX, PanelOrrery; stills checked",
++    "at": "2026-11-08"
++  },
+   "13": {
+     "state": "done",
+     "note": "S0 Hook scene",
+diff --git a/src/dev/sheets/DevPlanetX.tsx b/src/dev/sheets/DevPlanetX.tsx
+new file mode 100644
+index 0000000..16c7095
+--- /dev/null
++++ b/src/dev/sheets/DevPlanetX.tsx
+@@ -0,0 +1,96 @@
++import React from "react";
++import { AbsoluteFill, useCurrentFrame } from "remotion";
++import "../../ui/theme.css";
++import { focusRect } from "../../config/focus";
++import { fonts, theme } from "../../config/theme";
++import { LOGICAL, STAGE } from "../../config/timeline";
++import { FontsReady } from "../../lib/fonts";
++import { ORRERY_DEFAULT, PanelOrrery, type PanelOrreryState } from "../../ui/PanelOrrery";
++import { PanelPlanetX, PLANETX_DEFAULT, type PanelPlanetXState } from "../../ui/PanelPlanetX";
++import { PanelTabs, type PanelTabsState } from "../../ui/PanelTabs";
++import type { DevSheet } from "../registry";
++
++const STEP = 20;
++const SCALE = 1.2;
++
++interface Case {
++  label: string;
++  planetx: PanelPlanetXState;
++  orrery: PanelOrreryState;
++}
++
++const tabs: PanelTabsState = { tab: "planetx", reveal: 1 };
++const lab: PanelPlanetXState = { ...PLANETX_DEFAULT, outReveal: 1 };
++const full: PanelPlanetXState = { ...lab, measureReveal: 1, marks: 2, fitReveal: 1 };
++const orr: PanelOrreryState = { ...ORRERY_DEFAULT, reveal: 1 };
++
++const CASES: Case[] = [
++  { label: "distance 30, orrery day 0", planetx: { ...lab, distanceAu: 30 }, orrery: { ...orr, day: 0 } },
++  { label: "distance 100, orrery day 90", planetx: { ...lab, distanceAu: 100 }, orrery: { ...orr, day: 90 } },
++  { label: "distance 500, orrery day 180", planetx: { ...lab, distanceAu: 500 }, orrery: { ...orr, day: 180 } },
++  { label: "distance 1000, playing, day 180", planetx: { ...lab, distanceAu: 1000 }, orrery: { ...orr, day: 180, playing: true } },
++  { label: "distance 160 snaps to 200, day 35", planetx: { ...lab, distanceAu: 160 }, orrery: { ...orr, day: 35 } },
++  { label: "six-month line hidden", planetx: { ...lab, sixReveal: 0 }, orrery: { ...orr, day: 35 } },
++  { label: "measure block, nothing marked", planetx: { ...lab, measureReveal: 1, marks: 0 }, orrery: { ...orr, day: 35 } },
++  { label: "Mark A pressed (pulse)", planetx: { ...lab, measureReveal: 1, marks: 1, markPulse: 0.8 }, orrery: { ...orr, day: 36 } },
++  { label: "Mark B pressed (pulse)", planetx: { ...lab, measureReveal: 1, marks: 2, markPulse: 0.8 }, orrery: { ...orr, day: 37 } },
++  { label: "fit reveal 0", planetx: { ...lab, measureReveal: 1, marks: 2, fitReveal: 0 }, orrery: { ...orr, day: 37 } },
++  { label: "fit reveal 0.5", planetx: { ...lab, measureReveal: 1, marks: 2, fitReveal: 0.5 }, orrery: { ...orr, day: 37 } },
++  { label: "fit reveal 1, near", planetx: full, orrery: { ...orr, day: 37 } },
++  { label: "fit kind still", planetx: { ...full, fitKind: "still" }, orrery: { ...orr, day: 37 } },
++  { label: "fit kind distant", planetx: { ...full, fitKind: "distant" }, orrery: { ...orr, day: 37 } },
++  { label: "fit kind misfit", planetx: { ...full, fitKind: "misfit" }, orrery: { ...orr, day: 37 } },
++  { label: "orrery direction line 0.4, day 300", planetx: full, orrery: { ...orr, day: 300, dirReveal: 0.4 } },
++  { label: "orrery last day 486", planetx: full, orrery: { ...orr, day: 486 } },
++  { label: "pane half revealed", planetx: { ...full, reveal: 0.5, outReveal: 0.5, measureReveal: 0.5 }, orrery: { ...orr, reveal: 0.5, day: 90 } },
++];
++
++const DevPlanetX: React.FC = () => {
++  const frame = useCurrentFrame();
++  const i = Math.min(CASES.length - 1, Math.floor(frame / STEP));
++  const c = CASES[i];
++  const panel = focusRect("panel");
++  const left = (STAGE.w - panel.w * SCALE) / 2 - panel.x * SCALE;
++  const top = (STAGE.h - panel.h * SCALE) / 2 - panel.y * SCALE;
++  return (
++    <FontsReady>
++      <AbsoluteFill style={{ background: "#000" }}>
++        <div className="film-root" style={{ position: "relative", width: STAGE.w, height: STAGE.h, overflow: "hidden", background: theme.stageGradient }}>
++          <div
++            className="film-app-layer"
++            style={{
++              position: "absolute",
++              left: 0,
++              top: 0,
++              width: LOGICAL.w,
++              height: LOGICAL.h,
++              transform: `translate(${left}px, ${top}px) scale(${SCALE})`,
++              transformOrigin: "0 0",
++              background: theme.paper,
++              backgroundImage: theme.appBackground,
++            }}
++          >
++            <div
++              style={{
++                position: "absolute",
++                left: panel.x,
++                top: panel.y,
++                width: panel.w,
++                height: panel.h,
++                boxSizing: "border-box",
++                borderLeft: `1px solid ${theme.rule2}`,
++                background: "linear-gradient(180deg, rgba(11,13,20,0.9), rgba(6,7,11,0.96))",
++              }}
++            />
++            <PanelTabs state={tabs} />
++            <PanelPlanetX state={c.planetx} />
++            <PanelOrrery state={c.orrery} />
++          </div>
++          <div style={{ position: "absolute", left: 40, top: 40, color: theme.ink2, fontFamily: fonts.mono, fontSize: 22 }}>{`${i + 1}/${CASES.length} ${c.label}`}</div>
++        </div>
++      </AbsoluteFill>
++    </FontsReady>
++  );
++};
++
++export const devSheet: DevSheet = { id: "DevPlanetX", component: DevPlanetX, durationInFrames: STEP * CASES.length };
+diff --git a/src/ui/PanelOrrery.tsx b/src/ui/PanelOrrery.tsx
+index b7cde42..79afceb 100644
+--- a/src/ui/PanelOrrery.tsx
++++ b/src/ui/PanelOrrery.tsx
+@@ -1,13 +1,355 @@
+ import React from "react";
++import { alpha, theme } from "../config/theme";
+ import { focusRect } from "../config/focus";
+-import { Stub } from "./Stub";
++import { selectOrrery, selectPallas } from "../data/select";
++import { clamp01 } from "../lib/ease";
+ 
+ export interface PanelOrreryState {
+   reveal: number;
+   day: number;
+   playing: boolean;
++  dirReveal: number;
+ }
+ 
+-export const ORRERY_DEFAULT: PanelOrreryState = { reveal: 0, day: 0, playing: false };
++export const ORRERY_DEFAULT: PanelOrreryState = { reveal: 0, day: 0, playing: false, dirReveal: 1 };
+ 
+-export const PanelOrrery: React.FC<{ state: PanelOrreryState }> = () => <Stub name="PanelOrrery (stub)" rect={focusRect("orreryCard")} />;
++const RAD = Math.PI / 180;
++const OUTER_AU = 31;
++const SIZE = 184;
++const SCALE = SIZE / 316;
++const RING = SIZE / 2 - SIZE * 0.05;
++const MID = SIZE / 2;
++const FONT = 9.5;
++const MARGIN = 3;
++const SUN_R = 4.4;
++const MJD_UNIX_EPOCH = 40587;
++
++const PLANET_COLOR: Record<string, string> = {
++  mercury: "#b8b8b8",
++  venus: "#f0e0a0",
++  earth: "#4da3ff",
++  mars: "#ee6a4f",
++  jupiter: "#e0a468",
++  saturn: "#ead58f",
++  uranus: "#7fd8e6",
++  neptune: "#6b88ff",
++};
++
++const DOT_R: Record<string, number> = {
++  mercury: 1.7,
++  venus: 2.3,
++  earth: 2.5,
++  mars: 2,
++  jupiter: 3.8,
++  saturn: 3.3,
++  uranus: 2.7,
++  neptune: 2.7,
++};
++
++const APP_SIZE: Record<string, number> = {
++  mercury: 9,
++  venus: 12,
++  earth: 13,
++  mars: 10,
++  jupiter: 28,
++  saturn: 42,
++  uranus: 20,
++  neptune: 20,
++};
++
++const EARTH_ORBIT = "#7aa7ff";
++const EARTH_LABEL = "#cfe0ff";
++const DIRECTION_TEXT = "direction of this field";
++const NOTE =
++  "Top-down view, square-root distance scale. The violet dashed line is the direction of this field from Earth: a distant Planet X would lie somewhere along it.";
++
++const STARS: [number, number, number][] = Array.from({ length: 170 }, (_, i) => {
++  const a = Math.sin(i * 127.1) * 43758.5453;
++  const b = Math.sin(i * 311.7) * 12543.853;
++  return [a - Math.floor(a), b - Math.floor(b), 0.15 + ((((a * 7) % 1) + 1) % 1) * 0.5];
++});
++
++const lift = (v: number): React.CSSProperties => ({ opacity: v, transform: `translateY(${((1 - v) * 6).toFixed(2)}px)` });
++
++const titleCase = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
++
++function radius(au: number): number {
++  return RING * (0.1 + 0.9 * Math.sqrt(au / OUTER_AU));
++}
++
++function project(x: number, y: number): [number, number] {
++  const r = Math.hypot(x, y);
++  if (r === 0) return [MID, MID];
++  const k = radius(r) / r;
++  return [MID + x * k, MID - y * k];
++}
++
++function positionAt(track: number[][], index: number): [number, number, number] {
++  const last = track.length - 1;
++  const t = Math.min(last, Math.max(0, index));
++  const i = Math.min(last - 1, Math.floor(t));
++  const f = t - i;
++  const a = track[i];
++  const b = track[i + 1];
++  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, (a[2] ?? 0) + ((b[2] ?? 0) - (a[2] ?? 0)) * f];
++}
++
++function textWidth(text: string): number {
++  let em = 0;
++  for (const ch of text) {
++    if (ch === " ") em += 0.25;
++    else if (/[A-Z]/.test(ch)) em += 0.62;
++    else if (/[mw]/.test(ch)) em += 0.7;
++    else if (/[ijlt.,']/.test(ch)) em += 0.28;
++    else em += 0.44;
++  }
++  return em * FONT;
++}
++
++interface Disc {
++  x: number;
++  y: number;
++  r: number;
++}
++
++interface LabelItem extends Disc {
++  text: string;
++  w: number;
++  color: string;
++  prio: number;
++  ignoreLine: boolean;
++}
++
++interface Placed {
++  text: string;
++  x: number;
++  y: number;
++  color: string;
++  leader: [number, number, number, number] | null;
++}
++
++type Box = [number, number, number, number];
++
++const overlap = (a: Box, b: Box): number =>
++  Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0])) * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
++
++const hitsDisc = (r: Box, d: Disc, pad: number): boolean =>
++  Math.hypot(Math.max(r[0], Math.min(d.x, r[2])) - d.x, Math.max(r[1], Math.min(d.y, r[3])) - d.y) < d.r + pad;
++
++function layoutLabels(items: LabelItem[], discs: Disc[], line: Disc[]): Placed[] {
++  const taken: Box[] = [];
++  const out: Placed[] = [];
++  const h = FONT;
++  const pad = 1.5 * SCALE;
++  for (const it of items) {
++    let best: { cost: number; box: Box } | null = null;
++    for (const extra of [0, 7 * SCALE, 15 * SCALE, 26 * SCALE, 40 * SCALE]) {
++      const g = it.r + 4 * SCALE + extra;
++      for (let k = 0; k < 12; k++) {
++        const ang = (k * Math.PI) / 6;
++        const cx = Math.cos(ang);
++        const cy = -Math.sin(ang);
++        const px = it.x + g * cx;
++        const py = it.y + g * cy;
++        const x0 = cx > 0.3 ? px : cx < -0.3 ? px - it.w : px - it.w / 2;
++        const y0 = cy > 0.3 ? py : cy < -0.3 ? py - h : py - h / 2;
++        const box: Box = [x0, y0, x0 + it.w, y0 + h];
++        let cost = extra * 2.2 + (k === 0 ? 0 : k === 6 ? 6 : 10 + Math.abs(k - 3));
++        const outside =
++          Math.max(0, MARGIN - box[0]) + Math.max(0, box[2] - (SIZE - MARGIN)) + Math.max(0, MARGIN - box[1]) + Math.max(0, box[3] - (SIZE - MARGIN));
++        if (outside > 0) cost += 5000 + outside * 60;
++        for (const p of taken) cost += overlap(box, [p[0] - 2 * SCALE, p[1] - SCALE, p[2] + 2 * SCALE, p[3] + SCALE]) * 3;
++        for (const d of discs) if (hitsDisc(box, d, pad)) cost += 3000;
++        if (!it.ignoreLine) for (const d of line) if (hitsDisc(box, d, 0)) cost += 25;
++        if (!best || cost < best.cost) best = { cost, box };
++        if (cost < 1) break;
++      }
++      if (best && best.cost < 1) break;
++    }
++    if (!best) continue;
++    const pick = best.box;
++    taken.push(pick);
++    const gap = Math.max(pick[0] - it.x - it.r, it.x - it.r - pick[2], pick[1] - it.y - it.r, it.y - it.r - pick[3]);
++    let leader: [number, number, number, number] | null = null;
++    if (gap > 12 * SCALE) {
++      const ax = Math.max(pick[0], Math.min(it.x, pick[2]));
++      const ay = Math.max(pick[1], Math.min(it.y, pick[3]));
++      const d = Math.hypot(ax - it.x, ay - it.y) || 1;
++      leader = [it.x + ((ax - it.x) / d) * (it.r + 1.5 * SCALE), it.y + ((ay - it.y) / d) * (it.r + 1.5 * SCALE), ax, ay];
++    }
++    out.push({ text: it.text, x: pick[0], y: pick[1] + h * 0.8, color: it.color, leader });
++  }
++  return out;
++}
++
++function sightLine(earthX: number, earthY: number, lon: number): [number, number][] {
++  const pts: [number, number][] = [];
++  for (let u = 0; u <= 80; u += 0.25) {
++    const x = earthX + u * Math.cos(lon * RAD);
++    const y = earthY + u * Math.sin(lon * RAD);
++    if (Math.hypot(x, y) > OUTER_AU) break;
++    pts.push(project(x, y));
++  }
++  return pts;
++}
++
++const pathOf = (pts: [number, number][]): string => pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join("");
++
++const Glyph: React.FC<{ playing: boolean }> = ({ playing }) =>
++  playing ? (
++    <svg width="9" height="10" viewBox="0 0 9 10" aria-hidden="true">
++      <rect x="1" y="1" width="2.5" height="8" fill="currentColor" />
++      <rect x="5.5" y="1" width="2.5" height="8" fill="currentColor" />
++    </svg>
++  ) : (
++    <svg width="9" height="10" viewBox="0 0 9 10" aria-hidden="true">
++      <path d="M1 0.8 8.2 5 1 9.2Z" fill="currentColor" />
++    </svg>
++  );
++
++export const PanelOrrery: React.FC<{ state: PanelOrreryState }> = ({ state }) => {
++  const rect = focusRect("orreryCard");
++  const orrery = selectOrrery();
++  const lon = selectPallas().pick.ecliptic.lon;
++  const reveal = clamp01(state.reveal);
++  const dir = clamp01(state.dirReveal);
++  const names = Object.keys(orrery.bodies);
++  const day = Math.min(orrery.days - 1, Math.max(0, state.day));
++  const index = day / orrery.step;
++  const date = new Date((orrery.mjd0 + day - MJD_UNIX_EPOCH) * 864e5).toISOString().slice(0, 10);
++  const frac = day / (orrery.days - 1);
++
++  const now = names.map((n) => ({ name: n, pos: positionAt(orrery.bodies[n], index) }));
++  const earth = now.find((b) => b.name === "earth");
++  const trails = names.map((n) => ({ name: n, d: pathOf(orrery.bodies[n].map((p) => project(p[0], p[1]))) }));
++
++  const discs: Disc[] = [{ x: MID, y: MID, r: SUN_R }];
++  const items: LabelItem[] = [];
++  const dots: Disc[] = [];
++  let line: [number, number][] = [];
++  if (earth && dir > 0) {
++    line = sightLine(earth.pos[0], earth.pos[1], lon);
++    if (line.length > 1) {
++      const end = line[line.length - 1];
++      items.push({ text: DIRECTION_TEXT, x: end[0], y: end[1], r: 3 * SCALE, w: textWidth(DIRECTION_TEXT), color: theme.violet, prio: 1, ignoreLine: true });
++      let last: [number, number] | null = null;
++      for (const p of line) {
++        if (!last || Math.hypot(p[0] - last[0], p[1] - last[1]) > 9 * SCALE) {
++          dots.push({ x: p[0], y: p[1], r: 2 * SCALE });
++          last = p;
++        }
++      }
++    }
++  }
++
++  const far = [...now].sort((p, q) => Math.hypot(q.pos[0], q.pos[1]) - Math.hypot(p.pos[0], p.pos[1]));
++  const drawn = far.map((b) => {
++    const [x, y] = project(b.pos[0], b.pos[1]);
++    const r = DOT_R[b.name] ?? 2.2;
++    const isEarth = b.name === "earth";
++    const reach = r + (isEarth ? 2.6 : 0);
++    discs.push({ x, y, r: reach });
++    items.push({
++      text: titleCase(b.name),
++      x,
++      y,
++      r: reach,
++      w: textWidth(titleCase(b.name)),
++      color: isEarth ? EARTH_LABEL : alpha(theme.ink, 0.94),
++      prio: isEarth ? 0 : 2 + (40 - (APP_SIZE[b.name] ?? 10)) / 100,
++      ignoreLine: false,
++    });
++    return { name: b.name, x, y, r, isEarth };
++  });
++  items.sort((a, b) => a.prio - b.prio);
++  const labels = layoutLabels(items, discs, dots);
++
++  let arrow = "";
++  if (line.length > 1) {
++    const a = line[line.length - 2];
++    const b = line[line.length - 1];
++    const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
++    const hd = 5;
++    arrow = `${b[0].toFixed(1)},${b[1].toFixed(1)} ${(b[0] - hd * Math.cos(ang - 0.45)).toFixed(1)},${(b[1] - hd * Math.sin(ang - 0.45)).toFixed(1)} ${(b[0] - hd * Math.cos(ang + 0.45)).toFixed(1)},${(b[1] - hd * Math.sin(ang + 0.45)).toFixed(1)}`;
++  }
++
++  return (
++    <div className="sb-pan sb-orr" style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }} data-anchor="orreryCard">
++      <section className="card" style={lift(reveal)}>
++        <h2 className="lbl">
++          <i>2.</i>
++          Solar system
++          <span className="small tt" data-anchor="orDate">
++            {date}
++          </span>
++        </h2>
++        <div className="orbody">
++          <svg className="orsvg" width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} data-anchor="orrery">
++            <defs>
++              <radialGradient id="sb-orr-glow">
++                <stop offset="0" stopColor={alpha(theme.accent, 0.55)} />
++                <stop offset="0.35" stopColor={alpha(theme.accent, 0.16)} />
++                <stop offset="1" stopColor={alpha(theme.accent, 0)} />
++              </radialGradient>
++              <radialGradient id="sb-orr-core" cx="0.4" cy="0.35" r="0.75">
++                <stop offset="0" stopColor="#fff8" />
++                <stop offset="0.25" stopColor={theme.warn} />
++                <stop offset="1" stopColor={theme.accentDeep} />
++              </radialGradient>
++            </defs>
++            {STARS.map((s, i) => (
++              <rect key={i} x={(s[0] * SIZE).toFixed(1)} y={(s[1] * SIZE).toFixed(1)} width={1} height={1} fill={alpha(theme.ink, s[2])} />
++            ))}
++            {trails.map((t) => (
++              <path key={t.name} d={t.d} fill="none" stroke={t.name === "earth" ? alpha(EARTH_ORBIT, 0.5) : alpha(theme.ink, 0.15)} strokeWidth={1} />
++            ))}
++            <circle cx={MID} cy={MID} r={SUN_R * 3.6} fill="url(#sb-orr-glow)" />
++            <circle cx={MID} cy={MID} r={SUN_R} fill="url(#sb-orr-core)" />
++            {line.length > 1 && (
++              <g opacity={dir}>
++                <path d={pathOf(line)} fill="none" stroke={alpha(theme.violet, 0.85)} strokeWidth={1.2} strokeDasharray={`${(5 * SCALE).toFixed(2)} ${(4 * SCALE).toFixed(2)}`} />
++                <polygon points={arrow} fill={alpha(theme.violet, 0.95)} />
++              </g>
++            )}
++            {drawn.map((b) => (
++              <g key={b.name}>
++                <circle cx={b.x.toFixed(2)} cy={b.y.toFixed(2)} r={b.r} fill={PLANET_COLOR[b.name] ?? theme.ink} stroke={alpha("#000000", 0.5)} strokeWidth={0.5} />
++                {b.isEarth && <circle cx={b.x.toFixed(2)} cy={b.y.toFixed(2)} r={b.r + 2.6} fill="none" stroke={alpha(PLANET_COLOR.earth, 0.55)} strokeWidth={1} />}
++              </g>
++            ))}
++            {labels.map((l) => (
++              <g key={l.text} opacity={l.text === DIRECTION_TEXT ? dir : 1}>
++                {l.leader && <line x1={l.leader[0].toFixed(1)} y1={l.leader[1].toFixed(1)} x2={l.leader[2].toFixed(1)} y2={l.leader[3].toFixed(1)} stroke={alpha(theme.ink, 0.3)} strokeWidth={1} />}
++                <text
++                  x={l.x.toFixed(1)}
++                  y={l.y.toFixed(1)}
++                  fontSize={FONT}
++                  fill={l.color}
++                  stroke={alpha(theme.sunken, 0.92)}
++                  strokeWidth={2.4}
++                  strokeLinejoin="round"
++                  paintOrder="stroke"
++                >
++                  {l.text}
++                </text>
++              </g>
++            ))}
++          </svg>
++          <div className="orside">
++            <div className={state.playing ? "btn ghost on" : "btn ghost"} data-anchor="orPlay">
++              <Glyph playing={state.playing} />
++              <span>{state.playing ? "Pause" : "Play"}</span>
++            </div>
++            <div className="rng" data-anchor="orSlider">
++              <div className="track">
++                <div className="fill" style={{ width: `${(frac * 100).toFixed(2)}%` }} />
++              </div>
++              <div className="thumb" style={{ left: `${(frac * 100).toFixed(2)}%` }} />
++            </div>
++            <div className="small ornote">{NOTE}</div>
++          </div>
++        </div>
++      </section>
++    </div>
++  );
++};
+diff --git a/src/ui/PanelPlanetX.tsx b/src/ui/PanelPlanetX.tsx
+index 21db9dd..7e45a44 100644
+--- a/src/ui/PanelPlanetX.tsx
++++ b/src/ui/PanelPlanetX.tsx
+@@ -1,14 +1,261 @@
+ import React from "react";
++import { alpha, theme } from "../config/theme";
+ import { focusRect } from "../config/focus";
+-import { Stub } from "./Stub";
++import { selectFrame, selectPallas, selectParallax, selectShift } from "../data/select";
++import type { ParallaxEvidence, ShiftRow } from "../data/types";
++import { clamp01 } from "../lib/ease";
++
++export type FitKind = "still" | "near" | "distant" | "misfit";
+ 
+ export interface PanelPlanetXState {
+   distanceAu: number;
+   outReveal: number;
+   measureReveal: number;
+   fitReveal: number;
++  reveal: number;
++  sixReveal: number;
++  marks: number;
++  markPulse: number;
++  fitKind: FitKind | null;
+ }
+ 
+-export const PLANETX_DEFAULT: PanelPlanetXState = { distanceAu: 500, outReveal: 0, measureReveal: 0, fitReveal: 0 };
++export const PLANETX_DEFAULT: PanelPlanetXState = {
++  distanceAu: 500,
++  outReveal: 0,
++  measureReveal: 0,
++  fitReveal: 0,
++  reveal: 1,
++  sixReveal: 1,
++  marks: 2,
++  markPulse: 0,
++  fitKind: null,
++};
++
++type Fit = NonNullable<ParallaxEvidence["measuredPair"]["fit"]>;
++
++const MISSING = "Re-capture with: npm run evidence -- --repo <path to spherex-blink>";
++const SQRT2 = Math.SQRT2;
++
++function fmt(x: number, digits: number): string {
++  const k = 10 ** digits;
++  return (Math.round(x * k + 1e-7) / k).toFixed(digits);
++}
++
++function duration(days: number): string {
++  const h = days * 24;
++  if (h < 48) return `${fmt(h, h < 10 ? 1 : 0)} h`;
++  if (days < 60) return `${fmt(days, days < 10 ? 1 : 0)} d`;
++  return `${fmt(days / 30.44, 1)} months`;
++}
++
++function nearestRow(distanceAu: number): ShiftRow {
++  const table = selectParallax().table;
++  let best = table[0];
++  for (const row of table) {
++    if (Math.abs(row.distanceAu - distanceAu) < Math.abs(best.distanceAu - distanceAu)) best = row;
++  }
++  return selectShift(best.distanceAu);
++}
++
++function utcLabel(utc: string): string {
++  return `${utc.slice(0, 16).replace("T", " ")} UTC`;
++}
++
++const lift = (v: number): React.CSSProperties => ({ opacity: v, transform: `translateY(${((1 - v) * 6).toFixed(2)}px)` });
++
++function fitWords(kind: FitKind, fit: Fit, moved: number, total: number, span: string): React.ReactNode {
++  if (kind === "still") {
++    const limit = fit.limitAu > 5000 ? "5000+" : fmt(fit.limitAu, 0);
++    return (
++      <>
++        <b>No significant motion.</b>
++        {` Shift ${fmt(moved, 1)}″ is within the error (±${fmt(total, 1)}″). It is a fixed source such as a star, or a body too far for this baseline: over ${span} only bodies closer than about `}
++        <b>{`${limit} AU`}</b>
++        {" could show up."}
++      </>
++    );
++  }
++  if (kind === "near") {
++    if (fit.predictedAtDminArcsec === null) throw new Error(`evidence: parallax.measuredPair.fit.predictedAtDminArcsec is missing. ${MISSING}`);
++    return (
++      <>
++        <b>Nearby object: asteroid or comet.</b>
++        {` It moved far more than any body beyond ${fit.dminAu} AU can through parallax (even at ${fit.dminAu} AU the shift would be ${fmt(fit.predictedAtDminArcsec, 0)}″).`}
++      </>
++    );
++  }
++  if (kind === "distant") {
++    const [lo, hi] = fit.rangeAu;
++    const range = fit.openHigh ? `more than ${fmt(lo, 0)} AU` : `${fmt(lo, 0)}–${fmt(hi, 0)} AU`;
++    return (
++      <>
++        <b>Consistent with a distant body.</b>
++        {" Best fit "}
++        <b>{`${fmt(fit.distanceAu, 0)} AU`}</b>
++        {` (68% range ${range}). This is a `}
++        <b>candidate</b>
++        {", not a detection: it needs confirming in another pass."}
++      </>
++    );
++  }
++  return (
++    <>
++      <b>Moves, but not as parallax predicts.</b>
++      {" More likely noise, an artifact, a mis-click or a nearby slow object."}
++    </>
++  );
++}
++
++const VERDICT_CLASS: Record<FitKind, string> = { still: "still", near: "near", distant: "far", misfit: "mis" };
++
++export const PanelPlanetX: React.FC<{ state: PanelPlanetXState }> = ({ state }) => {
++  const lab = focusRect("pxLab");
++  const measureRect = focusRect("pxMeasure");
++  const top = lab.y;
++  const height = Math.max(lab.y + lab.h, measureRect.y + measureRect.h) - top;
++  const px = selectParallax();
++  const table = px.table;
++  const dMin = table[0].distanceAu;
++  const dMax = table[table.length - 1].distanceAu;
++  const distance = Math.min(dMax, Math.max(dMin, state.distanceAu));
++  const frac = (distance - dMin) / (dMax - dMin);
++  const row = nearestRow(distance);
++  const reveal = clamp01(state.reveal);
++  const out = clamp01(state.outReveal) * reveal;
++  const six = clamp01(state.sixReveal);
++  const measure = clamp01(state.measureReveal) * reveal;
++  const fitReveal = clamp01(state.fitReveal);
++  const pulse = clamp01(state.markPulse);
++  const windowDays = px.window.mjdTo - px.window.mjdFrom;
++  const windowSpan = duration(windowDays);
++  const windowRate = row.windowArcsec / (windowDays * 24);
++  const target = selectPallas().target;
++
++  const pair = px.measuredPair;
++  if (!pair.fit) throw new Error(`evidence: parallax.measuredPair.fit is missing. ${MISSING}`);
++  const frameA = selectFrame(pair.a);
++  const frameB = selectFrame(pair.b);
++  const [first, second] = frameA.mjd <= frameB.mjd ? [frameA, frameB] : [frameB, frameA];
++  const baseline = second.mjd - first.mjd;
++  const baselineHours = baseline * 24;
++  const baselineSpan = duration(baseline);
++  const moved = pair.measuredArcsec;
++  const total = pair.sigmaArcsec * SQRT2;
++  const kind: FitKind = state.fitKind ?? pair.fit.kind;
++  const aSet = state.marks >= 1;
++  const bSet = state.marks >= 2;
++  const numsOpacity = clamp01(state.marks - 1);
++  const hintOpacity = clamp01(2 - state.marks);
++  const ringTarget: "A" | "B" = state.marks >= 2 ? "B" : "A";
++  const ring = (which: "A" | "B"): React.CSSProperties =>
++    which === ringTarget && pulse > 0
++      ? {
++          borderColor: alpha(theme.accent, 0.4 + 0.6 * pulse),
++          boxShadow: `0 0 0 ${(2 * pulse).toFixed(2)}px ${alpha(theme.accent, 0.55 * pulse)}, 0 0 ${(18 * pulse).toFixed(1)}px ${alpha(theme.accent, 0.35 * pulse)}`,
++        }
++      : {};
+ 
+-export const PanelPlanetX: React.FC<{ state: PanelPlanetXState }> = () => <Stub name="PanelPlanetX (stub)" rect={focusRect("pxLab")} />;
++  return (
++    <div className="sb-pan sb-px" style={{ left: lab.x, top, width: lab.w, height }} data-anchor="pxLab">
++      <section className="card">
++        <h2 className="lbl" style={lift(reveal)}>
++          <i>1.</i>
++          Planet X lab
++        </h2>
++        <div style={lift(reveal)}>
++          <div className="small desc">What would a distant planet look like here? Earth's own motion makes it drift slowly.</div>
++          <div className="slider" data-anchor="pxDistance">
++            <div className="shead">
++              <span>Distance</span>
++              <b>{`${Math.round(distance / 10) * 10} AU`}</b>
++            </div>
++            <div className="rng">
++              <div className="track">
++                <div className="fill" style={{ width: `${(frac * 100).toFixed(2)}%` }} />
++              </div>
++              <div className="thumb" style={{ left: `${(frac * 100).toFixed(2)}%` }} />
++            </div>
++          </div>
++        </div>
++        <div className="pxout" style={lift(out)} data-anchor="pxOutput">
++          <p>
++            {"A body at "}
++            <b>{`${row.distanceAu} AU`}</b>
++            {" would shift "}
++            <b>{`${fmt(row.windowArcsec, row.windowArcsec < 100 ? 1 : 0)}″ = ${fmt(row.windowPx, 1)} pixels`}</b>
++            {` over these ${windowSpan} (${fmt(windowRate, 3)}″/hour).`}
++          </p>
++          <div className="px-grid">
++            <div>
++              <span>{"error on a measured shift (1σ per axis)"}</span>
++              <b>{`±${fmt(px.sigmaArcsec, 1)}″`}</b>
++            </div>
++            <div>
++              <span>farthest body distinguishable from a star here</span>
++              <b>{`~${px.detectLimitAu > 5000 ? ">5000" : fmt(px.detectLimitAu, 0)} AU`}</b>
++            </div>
++            <div className="hl" style={lift(six)} data-anchor="pxSixMonth">
++              <span>same body, a second pass 6 months later</span>
++              <b>{`${fmt(row.sixMonthArcsec, 0)}″ = ${fmt(row.sixMonthPx, 0)} px`}</b>
++            </div>
++          </div>
++          <span className="small">
++            <span style={{ opacity: six }}>
++              {`That is ${fmt(row.sixMonthOverWindow, 0)}× more shift than this field's ${windowSpan} window, which is why the challenge compares images six months apart. `}
++            </span>
++            {`For comparison, ${target} moves ${fmt(px.targetRateArcsecPerHour, 0)}″/hour.`}
++          </span>
++        </div>
++        <div className="mvblock" style={lift(measure)} data-anchor="pxMeasure">
++          <h3 className="lbl sub">Measure a mover</h3>
++          <div className="btnrow">
++            <div className="btn ghost" style={ring("A")} data-anchor="markA">
++              Mark A
++            </div>
++            <div className="btn ghost" style={ring("B")} data-anchor="markB">
++              Mark B
++            </div>
++            <div className="btn ghost" data-anchor="clearMk">
++              Clear
++            </div>
++          </div>
++          <div className="mvout">
++            <div className="ab">
++              <b>A</b>
++              {aSet ? utcLabel(first.utc) : "not set"}
++            </div>
++            <div className="ab">
++              <b>B</b>
++              {bSet ? utcLabel(second.utc) : "not set"}
++            </div>
++            <div className="mvbody">
++              <span className="small hint" style={{ opacity: hintOpacity }}>
++                Click the mover on one frame and press Mark A. Move the time bar, click it again, press Mark B.
++              </span>
++              <div style={{ opacity: numsOpacity }}>
++                <div className="mv-nums" data-anchor="pxMoved">
++                  <div>
++                    <span>{`moved · ${fmt(pair.measuredPx, 1)} px`}</span>
++                    <b>{`${fmt(moved, moved < 100 ? 1 : 0)}″ ± ${fmt(total, 1)}″`}</b>
++                  </div>
++                  <div>
++                    <span>in</span>
++                    <b>{baselineSpan}</b>
++                  </div>
++                  <div>
++                    <span>rate</span>
++                    <b>{`${fmt(moved / baselineHours, 2)} ± ${fmt(total / baselineHours, 2)}″/h`}</b>
++                  </div>
++                </div>
++                <div className={`verdict ${VERDICT_CLASS[kind]}`} style={{ opacity: fitReveal * numsOpacity, transform: `translateY(${((1 - fitReveal) * 6).toFixed(2)}px)` }} data-anchor="pxFit">
++                  <i />
++                  <span>{fitWords(kind, pair.fit, moved, total, baselineSpan)}</span>
++                </div>
++              </div>
++            </div>
++          </div>
++        </div>
++      </section>
++    </div>
++  );
++};
+diff --git a/src/ui/theme.css b/src/ui/theme.css
+index a8d4a8e..04bb889 100644
+--- a/src/ui/theme.css
++++ b/src/ui/theme.css
+@@ -1356,3 +1356,287 @@
+   background: rgba(255, 200, 120, 0.8);
+ }
+ .sb-context-end{}
++.sb-planetx-begin{}
++.sb-px .card,
++.sb-orr .card {
++  flex: none;
++  height: 100%;
++  gap: 0;
++  padding: 10px 26px 0;
++  border-bottom: 0;
++  overflow: hidden;
++}
++.sb-px .desc {
++  margin: 4px 0 0;
++  font-size: 12px;
++  line-height: 1.28;
++}
++.sb-px .slider {
++  display: flex;
++  flex-direction: column;
++  margin-top: 5px;
++}
++.sb-px .shead {
++  display: flex;
++  justify-content: space-between;
++  align-items: baseline;
++  font-size: 12.5px;
++  font-style: italic;
++  color: var(--ink-3);
++  line-height: 1.2;
++}
++.sb-px .shead b {
++  font-style: normal;
++  font-weight: 700;
++  font-size: 14px;
++  color: var(--ink);
++}
++.sb-px .rng,
++.sb-orr .rng {
++  position: relative;
++  flex: none;
++  height: 18px;
++}
++.sb-px .rng .track,
++.sb-orr .rng .track {
++  position: absolute;
++  left: 0;
++  right: 0;
++  top: 8px;
++  height: 2px;
++  border-radius: 2px;
++  background: var(--rule-2);
++}
++.sb-px .rng .fill,
++.sb-orr .rng .fill {
++  position: absolute;
++  left: 0;
++  top: 0;
++  bottom: 0;
++  border-radius: 2px;
++  background: var(--accent);
++}
++.sb-px .rng .thumb,
++.sb-orr .rng .thumb {
++  position: absolute;
++  top: 0;
++  width: 7px;
++  height: 18px;
++  margin-left: -3.5px;
++  border-radius: 1px;
++  background: var(--ink);
++  box-shadow:
++    0 0 0 2px var(--paper),
++    0 0 14px var(--ir-glow);
++}
++.sb-px .pxout {
++  margin-top: 6px;
++  font-size: 13.5px;
++  line-height: 1.32;
++  color: var(--ink-2);
++}
++.sb-px .pxout p {
++  margin: 0;
++}
++.sb-px .pxout b {
++  color: var(--accent);
++  font-weight: 700;
++}
++.sb-px .pxout > .small {
++  display: block;
++  font-size: 12px;
++  line-height: 1.28;
++}
++.sb-px .px-grid,
++.sb-px .mv-nums {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 5px 14px;
++  margin: 6px 0 4px;
++}
++.sb-px .mv-nums {
++  grid-template-columns: repeat(3, 1fr);
++  gap: 0 12px;
++  margin: 5px 0 3px;
++}
++.sb-px .px-grid > div,
++.sb-px .mv-nums > div {
++  border-top: 2px solid var(--rule-3);
++  padding-top: 3px;
++}
++.sb-px .px-grid span,
++.sb-px .mv-nums span {
++  display: block;
++  font-size: 12px;
++  color: var(--ink-3);
++  font-style: italic;
++  line-height: 1.2;
++}
++.sb-px .pxout .px-grid b,
++.sb-px .mv-nums b {
++  display: block;
++  margin-top: 1px;
++  font-size: 17px;
++  font-weight: 400;
++  line-height: 1.2;
++  color: var(--ink);
++}
++.sb-px .mv-nums b {
++  font-size: 14.5px;
++  white-space: nowrap;
++}
++.sb-px .px-grid .hl {
++  display: flex;
++  grid-column: 1 / -1;
++  justify-content: space-between;
++  align-items: baseline;
++  border-top-color: var(--violet);
++}
++.sb-px .pxout .px-grid .hl b {
++  margin-top: 0;
++}
++.sb-px .pxout .px-grid .hl b {
++  color: var(--violet);
++}
++.sb-px .mvblock {
++  margin-top: 4px;
++}
++.sb-px .mvblock .lbl.sub {
++  padding-top: 5px;
++}
++.sb-px .btnrow {
++  display: flex;
++  gap: 8px;
++  margin-top: 4px;
++}
++.sb-px .btn,
++.sb-orr .btn {
++  display: flex;
++  flex: 1;
++  align-items: center;
++  justify-content: center;
++  gap: 6px;
++  box-sizing: border-box;
++  height: 24px;
++  padding: 0 12px;
++  font-size: 13.5px;
++  color: var(--ink);
++  white-space: nowrap;
++  background: transparent;
++  border: 1px solid var(--rule-2);
++  border-radius: 3px;
++}
++.sb-orr .btn.on {
++  color: var(--accent);
++  border-color: var(--accent);
++  background: rgba(242, 162, 68, 0.09);
++}
++.sb-px .mvout {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 0 12px;
++  margin-top: 4px;
++  font-size: 13px;
++  line-height: 1.35;
++  color: var(--ink-2);
++}
++.sb-px .ab {
++  font-size: 12.5px;
++  line-height: 1.35;
++  white-space: nowrap;
++}
++.sb-px .ab b {
++  display: inline-block;
++  width: 16px;
++  color: var(--accent);
++  font-style: italic;
++  font-weight: 700;
++}
++.sb-px .mvbody {
++  position: relative;
++  grid-column: 1 / -1;
++}
++.sb-px .mvbody .hint {
++  position: absolute;
++  left: 0;
++  right: 0;
++  top: 4px;
++  display: block;
++  font-size: 12.5px;
++  line-height: 1.3;
++}
++.sb-px .verdict {
++  margin: 5px 0 0;
++  padding: 5px 9px;
++  font-size: 12.5px;
++  line-height: 1.3;
++}
++.sb-px .verdict i {
++  margin-top: 4px;
++}
++.sb-px .verdict.near {
++  border-left-color: var(--good);
++}
++.sb-px .verdict.near i {
++  background: var(--good);
++}
++.sb-px .verdict.far {
++  border-left-color: var(--accent);
++}
++.sb-px .verdict.far i {
++  background: var(--accent);
++  box-shadow: 0 0 10px var(--ir-glow);
++}
++.sb-px .verdict.still {
++  border-left-color: var(--teal);
++}
++.sb-px .verdict.still i {
++  background: var(--teal);
++}
++.sb-px .verdict.mis {
++  border-left-color: var(--warn);
++}
++.sb-px .verdict.mis i {
++  background: var(--warn);
++}
++.sb-orr .card {
++  padding: 10px 26px 12px;
++}
++.sb-orr .lbl .tt {
++  font-family: var(--font-mono);
++  font-style: normal;
++  font-size: 12.5px;
++}
++.sb-orr .orbody {
++  display: flex;
++  align-items: flex-start;
++  gap: 12px;
++  margin-top: 8px;
++}
++.sb-orr .orsvg {
++  display: block;
++  flex: none;
++  border: 1px solid var(--rule-2);
++  border-radius: 2px;
++  background: radial-gradient(circle at 50% 50%, var(--raised) 0, var(--sunken) 76%);
++}
++.sb-orr .orsvg text {
++  font-family: var(--font-serif);
++  font-style: italic;
++}
++.sb-orr .orside {
++  display: flex;
++  flex: 1;
++  flex-direction: column;
++  gap: 8px;
++  min-width: 0;
++}
++.sb-orr .orside .btn {
++  flex: none;
++  width: 100%;
++}
++.sb-orr .ornote {
++  font-size: 12.5px;
++  line-height: 1.32;
++}
++.sb-planetx-end{}

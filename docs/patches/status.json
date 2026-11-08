@@ -9,6 +9,12 @@
     "note": "Context pane: PanelContext, SkyMapCard; stills checked",
     "at": "2026-11-08"
   },
+  "12": {
+    "state": "done",
+    "owner": "",
+    "note": "Planet X pane: PanelPlanetX, PanelOrrery; stills checked",
+    "at": "2026-11-08"
+  },
   "13": {
     "state": "done",
     "note": "S0 Hook scene",

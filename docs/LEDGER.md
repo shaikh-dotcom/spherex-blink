@@ -46,16 +46,15 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **56%** by effort weight (97 of 173 units; 0 more in progress)
-- Patches: 17 done, 0 in progress, 0 blocked, 9 not started (of 26)
-- Film scenes finished: 1320 of 4500 frames (29%)
-- Work left: 76 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work done: **61%** by effort weight (105 of 173 units; 0 more in progress)
+- Patches: 18 done, 0 in progress, 0 blocked, 8 not started (of 26)
+- Film scenes finished: 1800 of 4500 frames (40%)
+- Work left: 68 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **15** Scene S2 Data (weight 8; owns src/scenes/S2Data.tsx)
 - **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
 - **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
 - **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
@@ -81,7 +80,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 12 | 2 | done | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | Planet X pane: PanelPlanetX, PanelOrrery; stills checked |
 | 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
 | 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
-| 15 | 3 | todo | 8 | 07, 08, 09 | Scene S2 Data | - |
+| 15 | 3 | done | 8 | 07, 08, 09 | Scene S2 Data | Scene S2 Data |
 | 16 | 3 | todo | 10 | 07, 08, 09 | Scene S3 Blink | - |
 | 17 | 3 | todo | 10 | 09, 10 | Scene S4 Inspect | - |
 | 18 | 3 | todo | 8 | 09, 11 | Scene S5 Check | - |
@@ -269,6 +268,20 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Exit state: appOpacity 1 on 599, the pose equals the S2 stub's first keyframe (`kf(600, "fullWindow")`).
 - Checked: `npx tsc --noEmit` clean; `node tools/audit-motion.mjs --scene S1` 0 failures, 0 warnings; check-stills passes at 300, 315, 330, 345, 420, 450, 570, 585, 599; stills reviewed.
 - Requests for shared files: none. For patch 15 (S2): its first camera keyframe at 600 must be fullWindow at scaleBias 1, or it must open with a keyframe at 600 that matches the S1 end pose.
+
+### PATCH 15 (Scene S2 Data) - done
+
+- File: src/scenes/S2Data.tsx (replaces the stub; exports S2_CAMERA, S2_CURSOR, S2_STATE, S2Data).
+- Camera (holdShot, every move 36 frames, moves start on f600, f690, f780, f960): header f600-689, skyImage f690-779, bandPlates f780-959 with scaleBias 0.27 (zoom 1.87, under the 2.0 limit), then `centre` with scaleBias 1.22 (zoom 1.3) from f960 to f1079. Deviation: the beat sheet says figure for the last shot, but at figure framing the time bar is cropped out, so the sweep would be invisible; `centre` keeps the figure and the whole time bar in frame and puts the bar below the caption. `node tools/audit-motion.mjs --scene S2` passes (0 failures, 0 warnings).
+- Cue frames used: CUES.s2.caption 600 (s2.caption, out at 765), counter 690 (StatNumeral count-up over 45 frames for realFields and realFrames, cards fade out f762-780), badge f720 (Badge badges.real, tone ok, small, centred at the top of the stage, out at 774), bands 780 (Callout s2.bandsTag on bandPlates, out at 945), captionPatch 960 (out at 1065).
+- Slice fields set every frame: appOpacity 1; header fieldId "pallas", badge "real", tourPulse 0; rail fieldId "pallas", band, mode "static", hot, showKnown true; viewer fieldId "pallas", pairA, pairB, blinkPhase 0, zoom 1, cx, cy 0.5, selection null, overlayAB false, view "sky", reveal 1; time fieldId "pallas", position, epochSeg, reveal 1; tabs tab "inspect", reveal 1.
+- f600-779: band D1, viewer on pair A (pair.info.a). f780-959: rail.hot "band" and rail.band steps D1, D2, D4, D5 every 45 frames (f780, f825, f870, f915), viewer pairA = pairB = the first frame of each band in file order, blinkPhase 0. f960-1079: rail.hot null, band D1; time.position eases 0 to 1 over f960-1040 and back to 0 over f1040-1070; the viewer shows the D1 frame at the playhead (the latest D1 frame at or before the nearest tick, the first D1 frame before any), so the footprint changes across the days and the viewer is back on pair A when the playhead is under tick 5 of 13 (about f1060); time.epochSeg is 1, 2, 3 in thirds of f960-1040 then null (the Pallas field has one pass, so only segment 1 draws a highlight).
+- Entry state: as S1 exit. Exit state reached by f1079: rail.band = pair band D1, viewer pairA = pair.a at zoom 1, time.position 0, tabs.tab "inspect", rail.mode "static", overlayAB false.
+- Cursor: no clicks. Appears at f648 beside the header badge, crosses the sky image (f738), hovers the plates D1, D2, D4, D5 about 21 frames after each highlight starts (f822, f846, f891, f936), rests above the time bar (f984) and ends mid-image (f1056).
+- Stat numerals sit in two glass cards at stage x 96 and 1450, flanking the sky image at f690-780; the cards use an opaque glass fill, no backdrop-filter.
+- Captions over the figure shots overlap the app's own figure caption text; that is unavoidable with a lower-third caption on these shots.
+- Checked: `npx tsc --noEmit` clean; motion audit clean; stills at f600, 690, 720, 740, 780, 825, 870, 915, 960, 1000, 1020, 1040, 1079 reviewed.
+- Requests for shared files: none.
 
 ### AUDIT of patches 05 and 06 - 2026-11-08
 

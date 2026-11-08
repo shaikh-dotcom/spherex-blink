@@ -4,7 +4,7 @@ Deterministic Remotion motion video (1920x1080, 30 fps, 4500 frames = 150 s) for
 
 Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status and the handoff entries of finished patches), docs/bible/bible-04.md (frozen contract), then your patch in docs/patches/patch-NN.md. `node tools/make-prompt.mjs NN` builds a ready prompt in prompts-out/.
 
-## 1. Status: 15 of 26 patches done (about 46 percent of the effort, 1320 of 4500 scene frames)
+## 1. Status: 16 of 26 patches done (about 50 percent of the effort, 1320 of 4500 scene frames)
 
 | Patch | What | State |
 |---|---|---|
@@ -20,25 +20,26 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 07, 08 | UI: Header+TimeBar, Rail | DONE (stills checked on DevHeaderTime and DevRail; TimeBar and Rail slices gained a `fieldId` field, see the ledger) |
 | 09 | UI: SkyViewer (tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption) | DONE (tsc clean; DevSkyViewer stills and film frames 598 and 1100 checked; adds slice fields `refLayer` and `coach`) |
 | 10 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | DONE (tsc clean; DevInspect stills checked; adds flags fields `exportPulse` and `statePulse`; Requests for patch 23 in the ledger: flag rects and panel background) |
-| 11, 12 | UI: Context pane, Planet X pane | TODO, can start now |
+| 11 | UI: Context pane (PanelContext, SkyMapCard) | DONE (tsc clean; DevContext stills checked; adds context fields `acrossReveal`, `strictReveal`, `refReveal` and `refLayer`, see the ledger) |
+| 12 | UI: Planet X pane | TODO, can start now |
 | 15, 16 | Scenes S2, S3 | TODO, can start now (07, 08, 09 done) |
 | 17, 20 | Scenes S4, S7 | TODO, can start now (09, 10 done) |
-| 18 | Scene S5 | TODO after 11 (09 done) |
+| 18 | Scene S5 | TODO, can start now (09, 11 done) |
 | 19 | Scene S6 | TODO after 12 (03 and 09 done) |
 | 23 | Continuity and motion pass | TODO after all scenes and 06 |
 | 24 | Audio sync and mix | TODO after 04 (done) and 23 |
 | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
 
-Remaining: 94 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
+Remaining: 86 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
 
-Ready now, all parallel (separate sessions or models): 11, 12, 15, 16, 17, 20. Run `node tools/ledger.mjs next` for the live list.
+Ready now, all parallel (separate sessions or models): 12, 15, 16, 17, 18, 20. Run `node tools/ledger.mjs next` for the live list.
 
 ## 2. What exists
 
 - src/config: theme, timeline (SCENES, CUT_FRAMES, CUES), copy, camera, focus (27 focus rects), filmState (frozen), sfx.
 - src/data: evidence.json (REAL capture, spherex-blink commit f525fd5), types, select (typed selectors).
 - src/fx, src/lib: motion toolkit. src/gfx: HookField, Mark, ParallaxDiagram, LimitsCard (finished). src/audio/FilmAudio.tsx (finished).
-- src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext, SkyMapCard, PanelPlanetX, PanelOrrery are STUBS with final exports (`XState`, `X_DEFAULT`, component); FilmApp.tsx is already wired.
+- src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext and SkyMapCard are FINISHED (patch 11). PanelPlanetX and PanelOrrery are STUBS with final exports (`XState`, `X_DEFAULT`, component); FilmApp.tsx is already wired.
 - src/scenes: S0Hook, S1Title, S8Limits and S9Outro are FINISHED (patches 13, 14, 21, 22). S2Data ... S7Flag are STUBS exporting `SN_CAMERA`, `SN_CURSOR`, `SN_STATE` and an overlay; index.ts wires all of them.
 - scripts: make-sheets (`npm run sheets -- --scene S3 --every 4`), capture-evidence, validate-evidence (`--final`), fetch-assets, make-sfx (`npm run sfx`, `sfx:check`), render (`--4k`, `--frames`, `--cut30`, `--from/--to`, `--browser`), check-stills.
 - tools: audit-motion.mjs (`npm run motion`, run it after every scene patch), ledger.mjs (`sync|status|next|start|done|block|check`), make-prompt.mjs, lib.mjs, shots.mjs (render named stills of any composition: `node tools/shots.mjs SpherexFilm 300,600 out/shots 0.5 <chrome>`).
@@ -75,5 +76,5 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
 ## 6. Next steps for whoever continues
 
 1. `npm install`, `npm run assets -- --from ../spherex-blink`, `npm run sfx`.
-2. Run the remaining UI patches 11, 12 (12 is on the critical path) and the scenes S2, S3, S4 and S7 (15, 16, 17, 20), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
-3. Then scenes 18 and 19, then 23, 24, 25.
+2. Run the remaining UI patch 12 (on the critical path) and the scenes S2, S3, S4, S5 and S7 (15, 16, 17, 18, 20), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
+3. Then scene 19, then 23, 24, 25.

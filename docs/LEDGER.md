@@ -46,20 +46,20 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **46%** by effort weight (79 of 173 units; 0 more in progress)
-- Patches: 15 done, 0 in progress, 0 blocked, 11 not started (of 26)
+- Work done: **50%** by effort weight (87 of 173 units; 0 more in progress)
+- Patches: 16 done, 0 in progress, 0 blocked, 10 not started (of 26)
 - Film scenes finished: 1320 of 4500 frames (29%)
-- Work left: 94 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work left: 86 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **11** UI: Context pane (PanelContext, SkyMapCard) (weight 8; owns src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx)
 - **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
 - **15** Scene S2 Data (weight 8; owns src/scenes/S2Data.tsx)
 - **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
 - **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
+- **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
 - **20** Scene S7 Flag (weight 8; owns src/scenes/S7Flag.tsx)
 
 ### Every patch
@@ -77,7 +77,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 08 | 2 | done | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | Rail, stills checked |
 | 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
 | 10 | 2 | done | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked |
-| 11 | 2 | todo | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | - |
+| 11 | 2 | done | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | Context pane: PanelContext, SkyMapCard; stills checked |
 | 12 | 2 | todo | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | - |
 | 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
 | 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
@@ -328,3 +328,19 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Focus names occupied: tabs, inspectMeta, moverCheck, flagForm, flagList.
 - Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevInspect stills reviewed at 0.6 and 1.0 scale: nothing selected, selected with verdict "moves", form shown, flagged with match note, export shown with pulse, state pill pulse, verdicts fixed, unclear and none, half reveal; the four-line "unclear" verdict fits above the split.
 - Requests for shared files: (1) src/config/focus.ts: the flag rects do not match the real layout, set flagForm to {x: 1208, y: 556, w: 392, h: 192} and flagList to {x: 1208, y: 748, w: 392, h: 148}; inspectMeta and moverCheck are fine. (2) src/ui/FilmApp.tsx: the empty `panel` div draws nothing, so the right panel has no background or left rule; give it `boxSizing: "border-box"`, `borderLeft: 1px solid theme.rule2` and `background: linear-gradient(180deg, rgba(11,13,20,0.9), rgba(6,7,11,0.96))` (no backdrop-filter), as DevInspect does.
+
+### PATCH 11 (Context pane) - done
+
+- Files: src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx, CSS block `.sb-context-begin{}` at the end of src/ui/theme.css.
+- Public API: `PanelContext`, `CONTEXT_DEFAULT`, `PanelContextState`; `SkyMapCard`, `SKYMAP_DEFAULT`, `SkyMapCardState`.
+- Layout: PanelContext is one absolute box from the top of `contextField` (y 130) to the bottom of `referenceBlend` (y 740) holding three cards with exactly the focus heights: This field (200), Reality check (260), Compare with other eyes (150). SkyMapCard fills the `skyMapCard` rect (y 740, h 150).
+- PanelContext slice (final): `reveal: number` (0; fades and lifts the This field card and the Compare with other eyes card), `validationReveal: number` (0; fades the Reality check card, multiplied by `reveal`), `referenceBlend: number` (0; fills the slider and prints it as a percentage, the credit line fades in over the first 0.2), `acrossReveal: number` (1; opens the across-fields stat 148/150 under the first three stats), `strictReveal: number` (1; opens the 107/150 stat and the app's explanatory sentence, and folds the intro sentence away so the card still fits 260), `refReveal: number` (1; extra fade for the Compare with other eyes card, multiplied by `reveal`), `refLayer: string` ("dss2"; one of dss2, 2mass, wise, picks the select text and the credit).
+- Staging for patch 18: the defaults of the three new fields show the complete card as soon as `validationReveal` is 1, so a scene that only sets the frozen fields still shows every number. For the S5 beat sheet set `acrossReveal: 0, strictReveal: 0` from f2220, then ramp `validationReveal` at f2310, `acrossReveal` at f2460 and `strictReveal` at f2580, and `refReveal` if the reference card should wait for f2640.
+- SkyMapCard slice (final, unchanged): `reveal: number` (0), `showKnown: boolean` (true; amber dots for the fields built around a known asteroid and the label of the Pallas target, off draws every field in ivory and dims the legend row).
+- Data: field rows from selectFields and selectPallas (target, frames in bands, dates and duration from the frame mjd, passes with the app's one-pass hint, size and tile pixels); Reality check from selectPallasValidation (13/13, 0.57 px, 3.5″, 13/13) and selectValidationAll totals (148/150 across 16 fields, 107/150 stricter). The map plots the 20 real fields from selectFields and rings the Pallas field.
+- Ported from the app: card wording and layout from controls.js fieldInfo and valCard, the explanatory sentence verbatim, the Hammer projection, graticule, ecliptic, galactic centre and the Milky Way re-projection from skymap.js (milkyway.jpg is re-projected once per page into a cached PNG; overlays are SVG so they stay sharp under the camera).
+- Deviations: the rms line prints 3.5″ from rms_offset_arcsec (the app rounds to 4″) to match the bible; the app's blurb and the verify_target.py line are left out (no evidence field, no room); the Sun, planets and 90 degree ring of the app's map are not drawn because the evidence has no per-frame sky positions; the this-field marker is a ring, not the app's white box.
+- Anchors (data-anchor): contextCard, contextField, realityCheck, referenceBlend, skyMapCard, skyMap.
+- Focus names occupied: contextField, realityCheck, referenceBlend, skyMapCard.
+- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevContext stills at validationReveal 0, 0.5 and 1, with the across and strict stages, referenceBlend 0 and 0.6, another reference layer, showKnown true and false, and a half revealed pane: nothing clipped, the strict note ends inside the 260 card.
+- Requests for shared files: (1) src/data/select.ts: add a selector for the reference layers (id, label, credit) from tiles/<field>/ref/ref.json; PanelContext keeps a three-entry table copied from that file because public/sky/credits.json holds only the planet and Milky Way credits.

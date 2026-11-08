@@ -71,8 +71,8 @@ These can all run at the same time in separate sessions: they need only finished
 | 02 | 1 | done | 4 | 00 | Graphics: HookField (S0 star field) and Mark (logo) | HookField and Mark |
 | 03 | 1 | done | 6 | 00 | Graphics: ParallaxDiagram (S6) and LimitsCard (S8) | ParallaxDiagram and LimitsCard |
 | 04 | 1 | done | 6 | 00 | Audio engine: sfx cue list, generator script, FilmAudio | audio engine |
-| 05 | 1 | done | 5 | 00 | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs | render and check-stills; cut30 untested |
-| 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion |
+| 05 | 1 | done | 5 | 00 | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs | render and check-stills; audited, cut30 verified at 900 frames, 4k verified |
+| 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion; audited |
 | 07 | 2 | todo | 6 | 00, 01 | UI: Header and TimeBar | - |
 | 08 | 2 | todo | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | - |
 | 09 | 2 | todo | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | - |
@@ -269,3 +269,14 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Exit state: appOpacity 1 on 599, the pose equals the S2 stub's first keyframe (`kf(600, "fullWindow")`).
 - Checked: `npx tsc --noEmit` clean; `node tools/audit-motion.mjs --scene S1` 0 failures, 0 warnings; check-stills passes at 300, 315, 330, 345, 420, 450, 570, 585, 599; stills reviewed.
 - Requests for shared files: none. For patch 15 (S2): its first camera keyframe at 600 must be fullWindow at scaleBias 1, or it must open with a keyframe at 600 that matches the S1 end pose.
+
+### AUDIT of patches 05 and 06 - 2026-11-08
+
+- Scope: scripts/render.mjs, scripts/check-stills.mjs, scripts/make-sheets.mjs, tools/audit-motion.mjs. Fixes are in commit 8a6d99c (patch-05-06-fixes.patch).
+- Fix 1 (render.mjs): `--cut30` produced 903 frames and 30.1 s because each part's AAC audio ran a few ms longer than its video and the concat step padded the video. Now each part has an `outpoint` in the concat list, `-fps_mode passthrough` (falls back to `-vsync 0` on old ffmpeg) and `-shortest`, and the script asserts the real frame count with `ffprobe -count_frames` and fails if it is not 900. Verified: 900 frames, video 30.000 s, audio 30.011 s, fade to ink at the end (last frame about RGB 7,5,8), audio fade -31.8 dB to -56.4 dB over the last half second.
+- Fix 2 (render.mjs): output pixel format was yuvj420p (full range, untagged); the spec says yuv420p. Added `colorSpace: "bt709"` to the render options and matching colour flags in the cut30 ffmpeg call. Verified: yuv420p, tv range, bt709 tagged, on normal renders and on the cut.
+- Fix 3 (render.mjs): `--frames` crashed on every run (also in the original code) because renderMedia cannot write image sequences. Switched to `renderFrames` from @remotion/renderer. An existing out/frames folder is renamed with a timestamp before a new run, and the PNG count is checked. Verified: 1920x1080 PNGs named element-N.png; a second run keeps the first in out/frames-<timestamp>.
+- Fix 4 (audit-motion.mjs): a camera drift shorter than 24 frames was never flagged, and any tiny zoom change (for example 0.1 percent) reset the hold counter. Now every move, drifts included, must be 24 frames or longer, and a drift under 2 percent no longer breaks a hold and prints a WARN. Verified with two synthetic camera tracks; real film results unchanged.
+- Checks that passed: check-stills `--frames 0,300` and the default list (33 stills: first, middle, last of every scene plus CUT_FRAMES); render `--from 0 --to 59` gives h264 plus aac with exactly 60 frames, re-running renames the old file with a timestamp, `--from 10 --to 5` exits 1 with a Fix message; `--4k --from 0 --to 14` gives 3840x2160, 15 frames, yuv420p; make-sheets `--scene S0 --every 20` writes a labelled sheet (partial last row, exact grid, unknown scene and no arguments all behave; ffmpeg has drawtext and tile); audit-motion passes S0, S1, S8, S9, and S2 to S7 fail only with the expected stub holds; exit codes are 0 clean and 1 on failure or unknown scene.
+- Open, low priority: the audit-motion `short` column now includes drifts; make-sheets writes the same file name for different `--every` or `--cols` values and overwrites.
+- Requests for shared files: none.

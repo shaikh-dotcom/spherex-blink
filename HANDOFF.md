@@ -13,8 +13,8 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 02 | gfx HookField + Mark | DONE |
 | 03 | gfx ParallaxDiagram + LimitsCard | DONE |
 | 04 | Audio: make-sfx.mjs, sfx.ts (71 cues), FilmAudio | DONE |
-| 05 | render.mjs, check-stills.mjs | DONE, but `--cut30` not yet run (see below) |
-| 06 | make-sheets.mjs, tools/audit-motion.mjs | DONE (audit passes on S8 and S9; S2 to S7 are still stubs and fail the hold check) |
+| 05 | render.mjs, check-stills.mjs | DONE and audited (`--cut30` verified at 900 frames, `--4k` verified) |
+| 06 | make-sheets.mjs, tools/audit-motion.mjs | DONE and audited (audit passes on S0, S1, S8, S9; S2 to S7 are still stubs and fail the hold check) |
 | 13, 14 | Scenes S0 Hook, S1 Title | DONE (stills checked, motion audit clean; S1 was coded against the bible-04 slice table because UI patches 07-12 are not finished, patch 23 rechecks it) |
 | 21, 22 | Scenes S8 Limits, S9 Outro | DONE (stills checked, motion audit clean; Request for patch 23 in the ledger: fade Grain and Vignette over 4470-4499) |
 | 07, 08, 09, 10, 11, 12 | UI: Header+TimeBar, Rail, SkyViewer, Inspect pane, Context pane, Planet X pane | TODO, can start now |
@@ -63,11 +63,11 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
 
 ## 5. Known issues and open items
 
-1. `node scripts/render.mjs --cut30` is untested. Its ranges were corrected to total 900 frames (the original plan summed to 780): 0-119, 1170-1289, 1800-1919, 2310-2429, 2880-2999, 3150-3269, 3480-3539, 4260-4379. Verify with `ffprobe -count_frames` that the result has 900 frames and a fade at the end.
+1. `node scripts/render.mjs --cut30` is verified: 900 frames, video 30.000 s, audio 30.011 s, yuv420p tv range bt709, fade to ink at the end. The ranges are 0-119, 1170-1289, 1800-1919, 2310-2429, 2880-2999, 3150-3269, 3480-3539, 4260-4379. A full run takes about 5 minutes and asserts the frame count itself.
 2. `evidence:final-check` prints two WARN lines (pair "chosen by rule"). Expected; the pair was verified by replication, not by clicking the live app. Optionally press Best pair in the live app (field Pallas patch, band D1) to confirm.
 3. LimitsCard has no Ceres row on purpose (the app does not explain Ceres). Patch 21 did not add one.
 4. Check the Space Apps submission page for any video length limit; none was found in the judging guide.
-5. Patch 06 was supplied as finished files and tested only on the stub scenes; re-run `npm run motion` after each scene patch.
+5. Patch 06 was audited on S0, S1, S8, S9 and on synthetic camera tracks; S2 to S7 are still stubs. Re-run `npm run motion` after each scene patch.
 
 ## 6. Next steps for whoever continues
 

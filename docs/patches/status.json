@@ -54,13 +54,13 @@
   "05": {
     "state": "done",
     "owner": "",
-    "note": "render and check-stills; cut30 untested",
+    "note": "render and check-stills; audited, cut30 verified at 900 frames, 4k verified",
     "at": "2026-11-08"
   },
   "06": {
     "state": "done",
     "owner": "",
-    "note": "make-sheets and audit-motion",
+    "note": "make-sheets and audit-motion; audited",
     "at": "2026-11-08"
   }
 }

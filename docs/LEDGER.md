@@ -46,16 +46,15 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **20%** by effort weight (34 of 173 units; 0 more in progress)
-- Patches: 8 done, 0 in progress, 0 blocked, 18 not started (of 26)
-- Film scenes finished: 720 of 4500 frames (16%)
-- Work left: 139 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
+- Work done: **17%** by effort weight (30 of 173 units; 0 more in progress)
+- Patches: 7 done, 0 in progress, 0 blocked, 19 not started (of 26)
+- Film scenes finished: 0 of 4500 frames (0%)
+- Work left: 143 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **06** Tooling: contact sheets and motion audit (weight 5; owns scripts/make-sheets.mjs, tools/audit-motion.mjs)
 - **07** UI: Header and TimeBar (weight 6; owns src/ui/Header.tsx, src/ui/TimeBar.tsx, src/dev/sheets/DevHeaderTime.tsx)
 - **08** UI: Rail (band plates, Blink controls, Layers, Keys) (weight 6; owns src/ui/Rail.tsx, src/dev/sheets/DevRail.tsx)
 - **09** UI: SkyViewer (blink canvas, overlays, selection, Planet X track) (weight 10; owns src/ui/SkyViewer.tsx, src/ui/viewer/*, src/dev/sheets/DevSkyViewer.tsx)
@@ -64,6 +63,8 @@ These can all run at the same time in separate sessions: they need only finished
 - **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
 - **13** Scene S0 Hook (weight 5; owns src/scenes/S0Hook.tsx)
 - **14** Scene S1 Title (weight 3; owns src/scenes/S1Title.tsx)
+- **21** Scene S8 Limits (weight 6; owns src/scenes/S8Limits.tsx)
+- **22** Scene S9 Outro (weight 3; owns src/scenes/S9Outro.tsx)
 
 ### Every patch
 
@@ -75,7 +76,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 03 | 1 | done | 6 | 00 | Graphics: ParallaxDiagram (S6) and LimitsCard (S8) | ParallaxDiagram and LimitsCard |
 | 04 | 1 | done | 6 | 00 | Audio engine: sfx cue list, generator script, FilmAudio | audio engine |
 | 05 | 1 | done | 5 | 00 | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs | render and check-stills; cut30 untested |
-| 06 | 1 | todo | 5 | 00 | Tooling: contact sheets and motion audit | - |
+| 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion |
 | 07 | 2 | todo | 6 | 00, 01 | UI: Header and TimeBar | - |
 | 08 | 2 | todo | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | - |
 | 09 | 2 | todo | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | - |
@@ -90,8 +91,8 @@ These can all run at the same time in separate sessions: they need only finished
 | 18 | 3 | todo | 8 | 09, 11 | Scene S5 Check | - |
 | 19 | 3 | todo | 12 | 03, 09, 12 | Scene S6 Planet X | - |
 | 20 | 3 | todo | 8 | 09, 10 | Scene S7 Flag | - |
-| 21 | 2 | done | 6 | 03 | Scene S8 Limits | S8 Limits scene |
-| 22 | 2 | done | 3 | 02 | Scene S9 Outro | S9 Outro scene |
+| 21 | 2 | todo | 6 | 03 | Scene S8 Limits | - |
+| 22 | 2 | todo | 3 | 02 | Scene S9 Outro | - |
 | 23 | 4 | todo | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | - |
 | 24 | 5 | todo | 6 | 04, 23 | Audio sync and mix | - |
 | 25 | 6 | todo | 6 | 05, 06, 24 | Final QA, renders and submission assets | - |
@@ -221,24 +222,9 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Tested: check-stills on 4 frames passes; a 60-frame render has h264 video plus aac audio.
 - NOT yet tested: `--cut30` (the 30 s cut). The range list was corrected to total exactly 900 frames: 0-119, 1170-1289, 1800-1919, 2310-2429, 2880-2999, 3150-3269, 3480-3539, 4260-4379 (the original list in the patch summed to 780). Run `node scripts/render.mjs --cut30` and confirm 900 frames with ffprobe -count_frames.
 
-### PATCH 21 (Scene S8 Limits) - done
+### PATCH 06 (contact sheets, motion audit) - done
 
-- File: src/scenes/S8Limits.tsx (exports `S8_CAMERA`, `S8_CURSOR`, `S8_STATE`, `S8Limits`).
-- Cue frames used: caption 3780, columns 3810, captionHatch 3900, captionClaim 4080, lift 4170-4199. The overlay returns null outside 3780-4199.
-- Slice fields set: appOpacity only, 1 to 0.15 over 3780-3810, held, then to 0 over 4170-4199 (exit state reached on the last frame).
-- LimitsCard progress is a piecewise map from the global frame: heads 3810-3825, row slots start on beats 3825, 3855, 3885, 3915, 3945, the card's own No coverage swatch lands 4050-4080. The card drifts 1.00 to 1.02 and lifts 70 px while fading over 4170-4199.
-- A larger hatch tile (same theme.hatchNoData on theme.sunken as LimitsCard) with the word "no data" sits above captionHatch from 3900 to 4080. LimitsCard's own smaller swatch appears at 4050, so both show for about 30 frames. No Ceres row was added.
-- Badge badges.prototype (tone warn) reveals at 4080 above captionClaim.
-- Camera: holdShot on fullWindow, arrive 24, push 0.03. Cursor: one hide waypoint at 3780.
-- Checked: `npx tsc --noEmit` clean; check-stills passes at 3780, 3825, 3900, 3990, 4080, 4140, 4185, 4199; stills reviewed.
-- Requests for shared files: none.
-
-### PATCH 22 (Scene S9 Outro) - done
-
-- File: src/scenes/S9Outro.tsx (exports `S9_CAMERA`, `S9_CURSOR`, `S9_STATE`, `S9Outro`).
-- Cue frames used: lockup 4260 (Mark draws 4260-4290), tagline 4275, link 4290 with an accent rule from 4296, repo 4305, tail 4320, ack 4350, fade to paper 4470-4499. The overlay returns null outside 4200-4499.
-- Slice fields set: appOpacity 0 for the whole scene. Entry state matches the S8 exit state.
-- The acknowledgement comes from selectAcknowledgement and is drawn only when evidence has one. The content block drifts 1.00 to 1.03 over 4260-4470. Camera: holdShot on fullWindow starting at scaleBias 1.03 (the S8 end pose), push 0.03.
-- Final frame 4499 measures mean RGB 5.1, 6.1, 10.0 (range 4-6, 5-7, 9-11) against theme paper 5, 6, 10; the remaining variation is Grain and Vignette, which sit above the scene overlays.
-- Checked: `npx tsc --noEmit` clean; check-stills passes at 4200, 4275, 4300, 4360, 4440, 4499; stills reviewed.
-- Requests for shared files: patch 23 may fade Grain and Vignette to zero over 4470-4499 so the last frame is exactly the paper colour.
+- Files: scripts/make-sheets.mjs, tools/audit-motion.mjs (npm scripts `sheets` and `motion`).
+- `node scripts/make-sheets.mjs --scene S3 --every 4` or `--from N --to M`: renders low-resolution stills and tiles them with ffmpeg into out/sheets/sheet-<from>-<to>.png plus a .txt listing each cell's frame. Options: `--cols 8`, `--scale 0.25`, `--browser <chrome path>`.
+- `node tools/audit-motion.mjs [--scene S3]`: loads the real scene camera through a TypeScript loader and checks holds (over 60 frames with no camera change), moves (under 24 frames), gaps, pan speed (over 160 px per frame), zoom above 2.0 for over 60 frames, first keyframe at the scene start, and moves off the beat. It exits 1 on any failure.
+- Tested on the stub scenes: the audit runs and reports the expected "hold of N frames" failure for all ten scenes (they have one keyframe each); the sheet test wrote sheet-0-299.png with 3 cells.

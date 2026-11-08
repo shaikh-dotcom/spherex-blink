@@ -1,16 +1,4 @@
 {
-  "21": {
-    "state": "done",
-    "owner": "",
-    "note": "S8 Limits scene",
-    "at": "2026-11-08"
-  },
-  "22": {
-    "state": "done",
-    "owner": "",
-    "note": "S9 Outro scene",
-    "at": "2026-11-08"
-  },
   "00": {
     "state": "done",
     "note": "starter repo",
@@ -39,6 +27,11 @@
   "05": {
     "state": "done",
     "note": "render and check-stills; cut30 untested",
+    "date": "2026-11-08"
+  },
+  "06": {
+    "state": "done",
+    "note": "make-sheets and audit-motion",
     "date": "2026-11-08"
   }
 }

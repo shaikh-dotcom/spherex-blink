@@ -46,10 +46,10 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **23%** by effort weight (39 of 173 units; 0 more in progress)
-- Patches: 9 done, 0 in progress, 0 blocked, 17 not started (of 26)
-- Film scenes finished: 720 of 4500 frames (16%)
-- Work left: 134 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
+- Work done: **27%** by effort weight (47 of 173 units; 0 more in progress)
+- Patches: 11 done, 0 in progress, 0 blocked, 15 not started (of 26)
+- Film scenes finished: 1320 of 4500 frames (29%)
+- Work left: 126 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
@@ -61,8 +61,6 @@ These can all run at the same time in separate sessions: they need only finished
 - **10** UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) (weight 10; owns src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx)
 - **11** UI: Context pane (PanelContext, SkyMapCard) (weight 8; owns src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx)
 - **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
-- **13** Scene S0 Hook (weight 5; owns src/scenes/S0Hook.tsx)
-- **14** Scene S1 Title (weight 3; owns src/scenes/S1Title.tsx)
 
 ### Every patch
 
@@ -81,8 +79,8 @@ These can all run at the same time in separate sessions: they need only finished
 | 10 | 2 | todo | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | - |
 | 11 | 2 | todo | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | - |
 | 12 | 2 | todo | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | - |
-| 13 | 2 | todo | 5 | 02 | Scene S0 Hook | - |
-| 14 | 2 | todo | 3 | 02 | Scene S1 Title | - |
+| 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
+| 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
 | 15 | 3 | todo | 8 | 07, 08, 09 | Scene S2 Data | - |
 | 16 | 3 | todo | 10 | 07, 08, 09 | Scene S3 Blink | - |
 | 17 | 3 | todo | 10 | 09, 10 | Scene S4 Inspect | - |
@@ -250,3 +248,24 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Motion audit (`node tools/audit-motion.mjs --scene S9`): 0 failures, 0 warnings.
 - Checked: `npx tsc --noEmit` clean; check-stills passes at 4200, 4275, 4300, 4360, 4440, 4499; stills reviewed.
 - Requests for shared files: patch 23 may fade Grain and Vignette to zero over 4470-4499 so the last frame is exactly the paper colour.
+
+### PATCH 13 (Scene S0 Hook) - done
+
+- File: src/scenes/S0Hook.tsx (exports `S0_CAMERA`, `S0_CURSOR`, `S0_STATE`, `S0Hook`).
+- Cue frames used: caption 60 (leaves at 150, before the flicker), HookField flicker 150-209 and settle 210 (frames inside the field itself), callout 210 (leaves at 282), tag 240 (fades up over 18 frames and holds to 299), the "Illustration" label from 240 is drawn by HookField. The overlay returns null outside 0-299.
+- Slice fields set: appOpacity 0 for the whole scene. Cursor: empty waypoint list (the cursor stays hidden).
+- The overlay renders HookField (start 0, end 299) behind the caption, callout and tag. The callout targets hookDotPoints().p2 in stage coordinates with no camera, so it stays on the dot during the 1.00 to 1.04 push inside HookField.
+- Camera: holdShot on fullWindow, arrive 30, push 0.04. The app is hidden, so the camera only decides the pose S1 starts from.
+- Checked: `npx tsc --noEmit` clean; `node tools/audit-motion.mjs --scene S0` 0 failures, 0 warnings; check-stills passes at 0, 60, 120, 150, 180, 210, 240, 270, 299; stills reviewed.
+- Requests for shared files: none.
+
+### PATCH 14 (Scene S1 Title) - done
+
+- File: src/scenes/S1Title.tsx (exports `S1_CAMERA`, `S1_CURSOR`, `S1_STATE`, `S1Title`).
+- Cue frames used: eyebrow 300 (fades up over 24 frames), Mark draw 315-345 with the lockup at 315, tagline 420 (two lines, 4 frame stagger). The block drifts 1.00 to 1.02 over 315-570. Title, Mark, eyebrow and tagline lift 90 px and fade together over 570-599. The overlay returns null outside 300-599.
+- The lockup is two KineticText blocks next to the Mark: SPHEREx at 315 (plain) and Blink Comparator at 321 (italic, accentInk), because KineticText can only italicise a whole text.
+- Slice fields set from the first frame: header.fieldId "pallas"; rail.band the pair band; viewer.fieldId "pallas", pairA and pairB from selectPair(), zoom 1, reveal 1; time.reveal 1; tabs.tab "inspect", tabs.reveal 1. appOpacity is 0 until 570, then a signature ramp that is exactly 1 on 599. HeaderState has no reveal field, so none is set. Patches 07 to 12 are not finished: this was coded against the slice table in bible-04 and must be rechecked by patch 23.
+- Camera: eases from the S0 end pose over 300-329, linear push to scaleBias 1.03 over 330-569, then eases back to fullWindow at scaleBias 1 over 570-599, landing exactly on frame 599.
+- Exit state: appOpacity 1 on 599, the pose equals the S2 stub's first keyframe (`kf(600, "fullWindow")`).
+- Checked: `npx tsc --noEmit` clean; `node tools/audit-motion.mjs --scene S1` 0 failures, 0 warnings; check-stills passes at 300, 315, 330, 345, 420, 450, 570, 585, 599; stills reviewed.
+- Requests for shared files: none. For patch 15 (S2): its first camera keyframe at 600 must be fullWindow at scaleBias 1, or it must open with a keyframe at 600 that matches the S1 end pose.

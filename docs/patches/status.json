@@ -62,5 +62,15 @@
     "owner": "",
     "note": "make-sheets and audit-motion; audited",
     "at": "2026-11-08"
+  },
+  "07": {
+    "state": "done",
+    "note": "Header and TimeBar, stills checked",
+    "at": "2026-11-08"
+  },
+  "08": {
+    "state": "done",
+    "note": "Rail, stills checked",
+    "at": "2026-11-08"
   }
 }

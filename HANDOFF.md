@@ -4,7 +4,7 @@ Deterministic Remotion motion video (1920x1080, 30 fps, 4500 frames = 150 s) for
 
 Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status and the handoff entries of finished patches), docs/bible/bible-04.md (frozen contract), then your patch in docs/patches/patch-NN.md. `node tools/make-prompt.mjs NN` builds a ready prompt in prompts-out/.
 
-## 1. Status: 11 of 26 patches done (about 27 percent of the effort, 1320 of 4500 scene frames)
+## 1. Status: 13 of 26 patches done (about 34 percent of the effort, 1320 of 4500 scene frames)
 
 | Patch | What | State |
 |---|---|---|
@@ -17,7 +17,8 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 06 | make-sheets.mjs, tools/audit-motion.mjs | DONE and audited (audit passes on S0, S1, S8, S9; S2 to S7 are still stubs and fail the hold check) |
 | 13, 14 | Scenes S0 Hook, S1 Title | DONE (stills checked, motion audit clean; S1 was coded against the bible-04 slice table because UI patches 07-12 are not finished, patch 23 rechecks it) |
 | 21, 22 | Scenes S8 Limits, S9 Outro | DONE (stills checked, motion audit clean; Request for patch 23 in the ledger: fade Grain and Vignette over 4470-4499) |
-| 07, 08, 09, 10, 11, 12 | UI: Header+TimeBar, Rail, SkyViewer, Inspect pane, Context pane, Planet X pane | TODO, can start now |
+| 07, 08 | UI: Header+TimeBar, Rail | DONE (stills checked on DevHeaderTime and DevRail; TimeBar and Rail slices gained a `fieldId` field, see the ledger) |
+| 09, 10, 11, 12 | UI: SkyViewer, Inspect pane, Context pane, Planet X pane | TODO, can start now |
 | 15, 16 | Scenes S2, S3 | TODO after 07, 08, 09 |
 | 17, 20 | Scenes S4, S7 | TODO after 09, 10 |
 | 18 | Scene S5 | TODO after 09, 11 |
@@ -26,9 +27,9 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 24 | Audio sync and mix | TODO after 04 (done) and 23 |
 | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
 
-Remaining: 126 of 173 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25.
+Remaining: 114 of 173 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25.
 
-Ready now, all parallel (separate sessions or models): 07, 08, 09, 10, 11, 12. Run `node tools/ledger.mjs next` for the live list.
+Ready now, all parallel (separate sessions or models): 09, 10, 11, 12. Run `node tools/ledger.mjs next` for the live list.
 
 ## 2. What exists
 
@@ -72,5 +73,5 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
 ## 6. Next steps for whoever continues
 
 1. `npm install`, `npm run assets -- --from ../spherex-blink`, `npm run sfx`.
-2. Run the UI patches 07-12 (09 is the largest and the critical path), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
+2. Run the UI patches 09-12 (09 is the largest and the critical path), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
 3. Then the remaining scenes 15-20, then 23, 24, 25.

@@ -46,17 +46,15 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **27%** by effort weight (47 of 173 units; 0 more in progress)
-- Patches: 11 done, 0 in progress, 0 blocked, 15 not started (of 26)
+- Work done: **34%** by effort weight (59 of 173 units; 0 more in progress)
+- Patches: 13 done, 0 in progress, 0 blocked, 13 not started (of 26)
 - Film scenes finished: 1320 of 4500 frames (29%)
-- Work left: 126 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
+- Work left: 114 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **07** UI: Header and TimeBar (weight 6; owns src/ui/Header.tsx, src/ui/TimeBar.tsx, src/dev/sheets/DevHeaderTime.tsx)
-- **08** UI: Rail (band plates, Blink controls, Layers, Keys) (weight 6; owns src/ui/Rail.tsx, src/dev/sheets/DevRail.tsx)
 - **09** UI: SkyViewer (blink canvas, overlays, selection, Planet X track) (weight 10; owns src/ui/SkyViewer.tsx, src/ui/viewer/*, src/dev/sheets/DevSkyViewer.tsx)
 - **10** UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) (weight 10; owns src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx)
 - **11** UI: Context pane (PanelContext, SkyMapCard) (weight 8; owns src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx)
@@ -73,8 +71,8 @@ These can all run at the same time in separate sessions: they need only finished
 | 04 | 1 | done | 6 | 00 | Audio engine: sfx cue list, generator script, FilmAudio | audio engine |
 | 05 | 1 | done | 5 | 00 | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs | render and check-stills; audited, cut30 verified at 900 frames, 4k verified |
 | 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion; audited |
-| 07 | 2 | todo | 6 | 00, 01 | UI: Header and TimeBar | - |
-| 08 | 2 | todo | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | - |
+| 07 | 2 | done | 6 | 00, 01 | UI: Header and TimeBar | Header and TimeBar, stills checked |
+| 08 | 2 | done | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | Rail, stills checked |
 | 09 | 2 | todo | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | - |
 | 10 | 2 | todo | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | - |
 | 11 | 2 | todo | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | - |
@@ -280,3 +278,23 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Checks that passed: check-stills `--frames 0,300` and the default list (33 stills: first, middle, last of every scene plus CUT_FRAMES); render `--from 0 --to 59` gives h264 plus aac with exactly 60 frames, re-running renames the old file with a timestamp, `--from 10 --to 5` exits 1 with a Fix message; `--4k --from 0 --to 14` gives 3840x2160, 15 frames, yuv420p; make-sheets `--scene S0 --every 20` writes a labelled sheet (partial last row, exact grid, unknown scene and no arguments all behave; ffmpeg has drawtext and tile); audit-motion passes S0, S1, S8, S9, and S2 to S7 fail only with the expected stub holds; exit codes are 0 clean and 1 on failure or unknown scene.
 - Open, low priority: the audit-motion `short` column now includes drifts; make-sheets writes the same file name for different `--every` or `--cols` values and overwrites.
 - Requests for shared files: none.
+
+### PATCH 07 (Header, TimeBar) - done
+
+- Files: src/ui/Header.tsx, src/ui/TimeBar.tsx, src/dev/sheets/DevHeaderTime.tsx, CSS blocks `.sb-header-begin{}` and `.sb-time-begin{}` at the end of src/ui/theme.css.
+- Both components position themselves absolutely at their focus rect (`header`, `timeBar`), like the stubs, because FilmApp does not wrap them.
+- Header slice (final): `fieldId: string` ("pallas"; the select shows the title from selectFields), `badge: "real" | "simulated"` ("real"; texts from badges in copy.ts), `tourPulse: number` (0; 0..1 amber ring and glow on Tour, computed from the value, no animation). Logo is Mark at size 38. Anchors: fieldSelect, badge, tourBtn, aboutBtn, helpBtn.
+- TimeBar slice (final): `position: number` (0, playhead 0..1), `epochSeg: null | number` (null; 1..3 highlights that pass band), `reveal: number` (1; fades and lifts the bar), ADDED `fieldId: string` ("pallas"; use "pallas-6mo" for the three-pass bar). One tick per frame in date order, equally spaced like the app's #ftick, tick colour by pass (1 muted, 2 teal, 3 violet), the tick nearest the playhead is amber and taller, UTC date labels at each pass start and at the end. The Pallas field has a single pass, so epochSeg 2 or 3 only highlights something with fieldId "pallas-6mo". Anchors: epoch1..epoch3, playhead.
+- Focus names occupied: header, timeBar.
+- Requests for shared files: none.
+
+### PATCH 08 (Rail) - done
+
+- Files: src/ui/Rail.tsx, src/dev/sheets/DevRail.tsx, CSS block `.sb-rail-begin{}` at the end of src/ui/theme.css.
+- The four sections are placed at the focus rects bandPlates, blinkControls, layers and keys (relative to the rail), so cursor and camera targets from focus.ts land on the real elements.
+- Rail slice (final): `band: string` ("D1"), `mode: "static" | "blink" | "overlay"` ("static"), `rateHz: 1 | 2 | 3 | 5` (3), `showKnown`, `showMask`, `snap`, `showFlags: boolean` (all true), `hot: null | "band" | "blink" | "pair" | "layers" | "keys"` (null; amber outline plus Glow; "blink" ringed the mode and rate controls, "pair" ringed Best pair), ADDED `fieldId: string` ("pallas"; only that field's bands are enabled, frame counts shown for pallas and pallas-6mo).
+- Real wording kept from the app: "Blink the shared footprint only" is the showMask layer, "Snap clicks to sources" is snap. A "Static" button was added next to Overlay so mode "static" has a visible control; Best pair shows the pair band and days apart from selectPair.
+- Anchors (data-anchor): bandD1..bandD6, bandPlates, blinkControls, blinkAB, modeStatic, modeOverlay, rate, rate1..rate5, bestPair, layers, layerKnown, layerMask, layerSnap, layerFlags, keys.
+- KeyCap is used with startFrame -1000 so keys are fully settled on any frame.
+- Focus names occupied: rail, bandPlates, blinkControls, layers, keys.
+- Requests for shared files: none. Note for patch 09: FilmApp passes SkyViewer only `state.viewer`, so read `showKnown`, `showMask` and `band` through useFilmState (import it carefully: filmState.ts imports SkyViewer, so move VIEWER_DEFAULT and the state type into src/ui/viewer/ and re-export them to avoid an import cycle).

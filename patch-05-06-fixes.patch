@@ -1,0 +1,177 @@
+diff --git a/scripts/render.mjs b/scripts/render.mjs
+index 89134fd..4888d48 100644
+--- a/scripts/render.mjs
++++ b/scripts/render.mjs
+@@ -3,7 +3,7 @@ import path from "node:path";
+ import { spawnSync } from "node:child_process";
+ import { fileURLToPath } from "node:url";
+ import { bundle } from "@remotion/bundler";
+-import { renderMedia, selectComposition } from "@remotion/renderer";
++import { renderFrames, renderMedia, selectComposition } from "@remotion/renderer";
+ 
+ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+ const OUT = path.join(ROOT, "out");
+@@ -85,6 +85,17 @@ function probe(file) {
+   else console.log("ffprobe not available: skipped the summary.");
+ }
+ 
++function countFrames(file) {
++  const r = spawnSync(
++    "ffprobe",
++    ["-v", "error", "-count_frames", "-select_streams", "v:0", "-show_entries", "stream=nb_read_frames", "-of", "default=nw=1:nk=1", file],
++    { encoding: "utf8" },
++  );
++  if (r.status !== 0) return null;
++  const n = Number(r.stdout.trim());
++  return Number.isFinite(n) ? n : null;
++}
++
+ function progress(label) {
+   return ({ progress: p, renderedFrames }) => {
+     process.stdout.write(`\r${label} ${String(renderedFrames).padStart(5)} frames  ${(p * 100).toFixed(1).padStart(5)}%`);
+@@ -101,6 +112,7 @@ const common = {
+   crf: 18,
+   x264Preset: "veryfast",
+   pixelFormat: "yuv420p",
++  colorSpace: "bt709",
+   audioCodec: "aac",
+   audioBitrate: "192k",
+   scale,
+@@ -121,23 +133,36 @@ if (has("--cut30")) {
+     parts.push(file);
+   }
+   const list = path.join(dir, "list.txt");
+-  fs.writeFileSync(list, parts.map((p) => `file '${p.replace(/\\/g, "/")}'`).join("\n") + "\n", "utf8");
++  const entries = parts.map((p, i) => {
++    const [from, to] = CUT_RANGES[i];
++    return `file '${p.replace(/\\/g, "/")}'\noutpoint ${((to - from + 1) / composition.fps).toFixed(6)}`;
++  });
++  fs.writeFileSync(list, entries.join("\n") + "\n", "utf8");
+   const out = freeFile(path.join(OUT, "spherex-blink-film-30s.mp4"));
+   const fadeStart = (CUT_TOTAL - 15) / 30;
+-  const r = spawnSync(
+-    "ffmpeg",
+-    [
+-      "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", list,
+-      "-vf", `fade=t=out:st=${fadeStart}:d=0.5:color=0x05060a`,
+-      "-af", `afade=t=out:st=${fadeStart}:d=0.5`,
+-      "-c:v", "libx264", "-crf", "18", "-preset", "veryfast", "-pix_fmt", "yuv420p",
+-      "-c:a", "aac", "-b:a", "192k", out,
+-    ],
+-    { stdio: "inherit" },
+-  );
+-  if (r.status !== 0) fail("Fix: ffmpeg could not join the parts of the 30 second cut.");
++  let r;
++  for (const keepFrames of [["-fps_mode", "passthrough"], ["-vsync", "0"]]) {
++    r = spawnSync(
++      "ffmpeg",
++      [
++        "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", list,
++        ...keepFrames, "-shortest",
++        "-vf", `fade=t=out:st=${fadeStart}:d=0.5:color=0x05060a`,
++        "-af", `afade=t=out:st=${fadeStart}:d=0.5`,
++        "-c:v", "libx264", "-crf", "18", "-preset", "veryfast", "-pix_fmt", "yuv420p",
++        "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-color_range", "tv",
++        "-c:a", "aac", "-b:a", "192k", out,
++      ],
++      { encoding: "utf8" },
++    );
++    if (r.status === 0) break;
++  }
++  if (r.status !== 0) fail(`Fix: ffmpeg could not join the parts of the 30 second cut.\n${r.stderr || "ffmpeg is not installed or not on PATH."}`);
+   fs.rmSync(dir, { recursive: true, force: true });
+-  console.log(`Wrote ${path.relative(ROOT, out)} (${(fs.statSync(out).size / 1048576).toFixed(1)} MB, ${CUT_TOTAL} frames).`);
++  const counted = countFrames(out);
++  if (counted === null) console.warn("WARN ffprobe is not available: the frame count of the cut was not verified.");
++  else if (counted !== CUT_TOTAL) fail(`Fix: the 30 second cut has ${counted} frames, expected ${CUT_TOTAL}. Check ${path.relative(ROOT, out)}.`);
++  console.log(`Wrote ${path.relative(ROOT, out)} (${(fs.statSync(out).size / 1048576).toFixed(1)} MB, ${counted === null ? CUT_TOTAL : counted} frames).`);
+   probe(out);
+   process.exit(0);
+ }
+@@ -148,18 +173,26 @@ if (!(from >= 0 && to >= from && to < TOTAL)) fail(`Fix: --from and --to must sa
+ const partial = from !== 0 || to !== TOTAL - 1;
+ 
+ if (has("--frames")) {
+-  const dir = path.join(OUT, "frames");
++  const dir = freeFile(path.join(OUT, "frames"));
+   fs.mkdirSync(dir, { recursive: true });
+-  await renderMedia({
+-    ...common,
+-    codec: "h264",
+-    imageSequence: true,
++  const wanted = to - from + 1;
++  await renderFrames({
++    composition,
++    serveUrl,
++    outputDir: dir,
+     imageFormat: "png",
+-    outputLocation: dir,
+     frameRange: [from, to],
+-    onProgress: progress("frames"),
++    scale,
++    browserExecutable,
++    concurrency,
++    onStart: () => {},
++    onFrameUpdate: (rendered) => {
++      process.stdout.write(`\rframes ${String(rendered).padStart(5)} of ${wanted}  ${((rendered / wanted) * 100).toFixed(1).padStart(5)}%`);
++    },
+   });
+   process.stdout.write("\n");
++  const written = fs.readdirSync(dir).filter((n) => n.endsWith(".png")).length;
++  if (written !== wanted) fail(`Fix: expected ${wanted} PNG frames in ${path.relative(ROOT, dir)} but found ${written}.`);
+   console.log(`Wrote ${to - from + 1} PNG frames to ${path.relative(ROOT, dir)}.`);
+   process.exit(0);
+ }
+diff --git a/tools/audit-motion.mjs b/tools/audit-motion.mjs
+index 375fc4d..8a2eb25 100644
+--- a/tools/audit-motion.mjs
++++ b/tools/audit-motion.mjs
+@@ -92,6 +92,7 @@ const MIN_GAP = 10;
+ const MAX_PAN = 160;
+ const ZOOM_LIMIT = 2.0;
+ const DRIFT_BIAS = 0.05;
++const MIN_DRIFT = 0.02;
+ 
+ const onlyScene = (() => {
+   const i = args.indexOf("--scene");
+@@ -124,7 +125,16 @@ for (let i = 0; i < FILM_CAMERA.length; i++) {
+   const k = FILM_CAMERA[i];
+   const prev = i > 0 ? FILM_CAMERA[i - 1] : null;
+   if (!prev || poseKey(k) === poseKey(prev)) continue;
+-  moves.push({ index: i, start: k.frame, end: k.frame + moveLen(k), len: moveLen(k), drift: isDrift(k, prev), ease: k.ease ?? "spring", kf: k });
++  moves.push({
++    index: i,
++    start: k.frame,
++    end: k.frame + moveLen(k),
++    len: moveLen(k),
++    drift: isDrift(k, prev),
++    mag: Math.abs(k.scaleBias / prev.scaleBias - 1),
++    ease: k.ease ?? "spring",
++    kf: k,
++  });
+ }
+ 
+ const frameState = new Map();
+@@ -157,7 +167,9 @@ for (const id of ids) {
+ 
+   const sceneMoves = moves.filter((m) => m.start >= sc.start && m.start <= sc.end);
+   const real = sceneMoves.filter((m) => !m.drift);
+-  const active = sceneMoves.slice().sort((a, b) => a.start - b.start);
++  const tiny = sceneMoves.filter((m) => m.drift && m.mag < MIN_DRIFT);
++  for (const m of tiny) warns.push(`push at f${m.start} changes the zoom by only ${(m.mag * 100).toFixed(2)} percent (needs ${MIN_DRIFT * 100} percent or more to count as a drift)`);
++  const active = sceneMoves.filter((m) => !m.drift || m.mag >= MIN_DRIFT).sort((a, b) => a.start - b.start);
+ 
+   let cursor = sc.start;
+   let longestHold = 0;
+@@ -183,9 +195,9 @@ for (const id of ids) {
+   if (longestHold > MAX_HOLD) fails.push(`hold of ${longestHold} frames from f${holdAt} with no camera change`);
+ 
+   let shortest = Infinity;
+-  for (const m of real) {
++  for (const m of sceneMoves) {
+     if (m.len < shortest) shortest = m.len;
+-    if (m.len < MIN_MOVE) fails.push(`move at f${m.start} lasts ${m.len} frames (minimum ${MIN_MOVE})`);
++    if (m.len < MIN_MOVE) fails.push(`${m.drift ? "push" : "move"} at f${m.start} lasts ${m.len} frames (minimum ${MIN_MOVE})`);
+   }
+ 
+   let minGap = Infinity;

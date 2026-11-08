@@ -92,6 +92,7 @@ const MIN_GAP = 10;
 const MAX_PAN = 160;
 const ZOOM_LIMIT = 2.0;
 const DRIFT_BIAS = 0.05;
+const MIN_DRIFT = 0.02;
 
 const onlyScene = (() => {
   const i = args.indexOf("--scene");
@@ -124,7 +125,16 @@ for (let i = 0; i < FILM_CAMERA.length; i++) {
   const k = FILM_CAMERA[i];
   const prev = i > 0 ? FILM_CAMERA[i - 1] : null;
   if (!prev || poseKey(k) === poseKey(prev)) continue;
-  moves.push({ index: i, start: k.frame, end: k.frame + moveLen(k), len: moveLen(k), drift: isDrift(k, prev), ease: k.ease ?? "spring", kf: k });
+  moves.push({
+    index: i,
+    start: k.frame,
+    end: k.frame + moveLen(k),
+    len: moveLen(k),
+    drift: isDrift(k, prev),
+    mag: Math.abs(k.scaleBias / prev.scaleBias - 1),
+    ease: k.ease ?? "spring",
+    kf: k,
+  });
 }
 
 const frameState = new Map();
@@ -157,7 +167,9 @@ for (const id of ids) {
 
   const sceneMoves = moves.filter((m) => m.start >= sc.start && m.start <= sc.end);
   const real = sceneMoves.filter((m) => !m.drift);
-  const active = sceneMoves.slice().sort((a, b) => a.start - b.start);
+  const tiny = sceneMoves.filter((m) => m.drift && m.mag < MIN_DRIFT);
+  for (const m of tiny) warns.push(`push at f${m.start} changes the zoom by only ${(m.mag * 100).toFixed(2)} percent (needs ${MIN_DRIFT * 100} percent or more to count as a drift)`);
+  const active = sceneMoves.filter((m) => !m.drift || m.mag >= MIN_DRIFT).sort((a, b) => a.start - b.start);
 
   let cursor = sc.start;
   let longestHold = 0;
@@ -183,9 +195,9 @@ for (const id of ids) {
   if (longestHold > MAX_HOLD) fails.push(`hold of ${longestHold} frames from f${holdAt} with no camera change`);
 
   let shortest = Infinity;
-  for (const m of real) {
+  for (const m of sceneMoves) {
     if (m.len < shortest) shortest = m.len;
-    if (m.len < MIN_MOVE) fails.push(`move at f${m.start} lasts ${m.len} frames (minimum ${MIN_MOVE})`);
+    if (m.len < MIN_MOVE) fails.push(`${m.drift ? "push" : "move"} at f${m.start} lasts ${m.len} frames (minimum ${MIN_MOVE})`);
   }
 
   let minGap = Infinity;

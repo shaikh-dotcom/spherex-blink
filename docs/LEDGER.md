@@ -46,16 +46,15 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **61%** by effort weight (105 of 173 units; 0 more in progress)
-- Patches: 18 done, 0 in progress, 0 blocked, 8 not started (of 26)
-- Film scenes finished: 1800 of 4500 frames (40%)
-- Work left: 68 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work done: **66%** by effort weight (115 of 173 units; 0 more in progress)
+- Patches: 19 done, 0 in progress, 0 blocked, 7 not started (of 26)
+- Film scenes finished: 2400 of 4500 frames (53%)
+- Work left: 58 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
 - **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
 - **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
 - **19** Scene S6 Planet X (weight 12; owns src/scenes/S6PlanetX.tsx)
@@ -81,7 +80,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
 | 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
 | 15 | 3 | done | 8 | 07, 08, 09 | Scene S2 Data | Scene S2 Data |
-| 16 | 3 | todo | 10 | 07, 08, 09 | Scene S3 Blink | - |
+| 16 | 3 | done | 10 | 07, 08, 09 | Scene S3 Blink | Scene S3 Blink |
 | 17 | 3 | todo | 10 | 09, 10 | Scene S4 Inspect | - |
 | 18 | 3 | todo | 8 | 09, 11 | Scene S5 Check | - |
 | 19 | 3 | todo | 12 | 03, 09, 12 | Scene S6 Planet X | - |
@@ -372,3 +371,17 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Focus names occupied: pxLab, pxDistance, pxOutput, pxMeasure, orreryCard.
 - Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; all 18 DevPlanetX cases rendered at scale 1: distance 30, 100, 500, 1000 and the 160 to 200 snap, six-month line hidden, measure block empty, Mark A and Mark B pulses, fit reveal 0, 0.5 and 1, the four fit kinds, orrery day 0, 90, 180, 300 (direction line at 0.4) and 486, and the half revealed pane. Nothing is clipped (the 4-line "still" verdict ends inside the lab box) and no orrery labels collide.
 - Requests for shared files: (1) src/config/focus.ts: `pxLab` (y 130, h 460) and `pxMeasure` (y 460, h 170) overlap by 130 px; the pane draws as one box from y 130 to 630, so for aiming callouts set `pxLab` to {y: 130, h: 330} and keep `pxMeasure` at y 460, h 170; `pxOutput` (y 225, h 230) is approximate (the output block runs from about y 215 to 330, the six-month cell sits at about y 270). (2) src/data/select.ts and the evidence: add the full orbit polyline per body (the app's orrery.json has `orbit`) and the measured and predicted angles in `parallax.measuredPair.fit`, so the orrery trails and the "distant" and "misfit" wordings can be complete. The current "distant" evidence prints a range of "25–25 AU", worth checking in the capture.
+
+### PATCH 16 (Scene S3 Blink) - done
+
+- File: src/scenes/S3Blink.tsx (replaces the stub; exports exactly S3_CAMERA, S3_CURSOR, S3_STATE, S3Blink).
+- Camera (every move 24 frames or longer, longest hold 15 frames, max zoom 1.53, under the 1.6 limit that `bias()` enforces by throwing): figure 1.283 at f1080, figure 1.32 at f1110, skyImage 1.46 at f1140 (45 frame move), skyImage 1.53 at f1200 (slow push, 150 frames), figure 1.283 at f1365, figure 1.34 at f1410 (180 frame drift), figure 1.386 at f1590, figure 1.283 at f1650 until the end. `node tools/audit-motion.mjs --scene S3` passes (0 failures, 0 warnings); the full audit now fails only on the S4 to S7 stubs.
+- Cue frames used: CUES.s3.badge 1080 (Badge badges.real, tone accent, centred at stage y 62, fades out over f1158-1170), calloutStars 1170 (out at 1230), calloutJump 1200 (out at 1260), captionPluto 1230 (out at 1290), calloutAmber 1290 (aimed at the A amber / B cyan key in the viewer HUD, out at 1350), captionPair 1410 (out at 1530), calloutWarn 1590 (out at 1650). Captions are 64 px.
+- Slice fields set every frame: appOpacity 1; header fieldId "pallas", badge "real"; rail fieldId "pallas", band = pair band (D1), mode "static" before f1140, "blink" f1140-1289, "overlay" f1290-1649, "static" from f1650, rateHz 3, showKnown true, showMask true, hot "blink" f1110-1199 and "pair" f1395-1469 (else null); viewer fieldId "pallas", pairA and pairB from selectPair, blinkPhase a frame-based square wave (A for 10 frames, B for 10 frames) from f1140 to f1289 and 0 elsewhere, zoom 1, cx and cy 0.5, selection null, overlayAB true only f1290-1649, view "sky", refBlend 0, pxDrawAu null, markA and markB null, reveal 1, coach true f1260-1379; time fieldId "pallas", position 0, epochSeg null, reveal 1; tabs tab "inspect", reveal 1.
+- Entry state: as S2 exit (band D1, pair A at zoom 1, mode "static"). Exit state reached at f1650 and held to f1679: rail.mode "static", viewer.overlayAB false, viewer.blinkPhase 0 (A shown), zoom 1, rail.showKnown true.
+- Cursor: appears at f1104, clicks Blink A to B at f1136 (4 frames before the f1140 state change), drifts across the image (f1196), clicks Best pair at f1406 (4 frames before captionPair at f1410), leaves and hides at f1444. Click targets are derived from the blinkControls focus rect (centre x, y + 45 and y + 157).
+- Star for "Stars stay put": fixed tile pixel (299, 277), a bright isolated star about 306 px from the asteroid track, aimed with tileToApp. The arrow lands on the star in the stills at f1215 and f1605.
+- Jump callout: aimed at the midpoint of the asteroid's A and B positions (selectTargetPosition for both frames, then tileToApp), not at A. Callout has one fixed target for chip and anchor, so following the blink phase would make the label box hop about 135 px at 3 Hz, and aiming at A left the arrow on empty sky and the anchor dot looking like a fixed star whenever frame B was shown. The known-object ring still jumps between the two positions with blinkPhase (drawn by SkyViewer).
+- Checked: `npx tsc --noEmit` clean; motion audit as above; stills at f1080, 1110, 1136, 1140, 1170, 1200, 1215, 1230, 1250, 1290, 1380, 1410, 1440, 1590, 1605, 1630, 1650, 1679 pass check-stills and the unreviewed ones were looked at (jump callout at an A frame and a B frame, Pluto caption, Best pair caption with the rail pair line "D1 - 1.36 days apart" lit, Judge by position callout). Stills were rendered with audio missing (`npm run sfx` not run), which only logs a 404 for the manifest.
+- Deviations: (1) the Best pair caption has no sub line with the pair dates and wavelengths; it collided with the app's own figure caption and was unreadable, so it was removed. (2) The Pluto and Best pair captions sit over the figure caption and the viewer toolbar row; they stay legible at 64 px, same situation as S2, so the size was not lowered.
+- Requests for shared files: none to edit. For patch 23 to judge: (1) the Overlay button is not clicked by the cursor, the mode switches by state only at f1290; (2) the badge is placed top-centre at stage y 62 and does not follow the header badge position; (3) no caption sub line for the pair (see Deviations); (4) if a callout variant with a separate chip anchor and dot anchor is ever added to src/fx/Callout.tsx, the jump callout could keep the chip still and put the dot on the live asteroid.

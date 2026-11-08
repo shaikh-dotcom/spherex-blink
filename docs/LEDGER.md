@@ -46,19 +46,20 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **34%** by effort weight (59 of 173 units; 0 more in progress)
-- Patches: 13 done, 0 in progress, 0 blocked, 13 not started (of 26)
+- Work done: **40%** by effort weight (69 of 173 units; 0 more in progress)
+- Patches: 14 done, 0 in progress, 0 blocked, 12 not started (of 26)
 - Film scenes finished: 1320 of 4500 frames (29%)
-- Work left: 114 effort units. Longest remaining chain: 09 -> 19 -> 23 -> 24 -> 25
+- Work left: 104 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **09** UI: SkyViewer (blink canvas, overlays, selection, Planet X track) (weight 10; owns src/ui/SkyViewer.tsx, src/ui/viewer/*, src/dev/sheets/DevSkyViewer.tsx)
 - **10** UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) (weight 10; owns src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx)
 - **11** UI: Context pane (PanelContext, SkyMapCard) (weight 8; owns src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx)
 - **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
+- **15** Scene S2 Data (weight 8; owns src/scenes/S2Data.tsx)
+- **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
 
 ### Every patch
 
@@ -73,7 +74,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion; audited |
 | 07 | 2 | done | 6 | 00, 01 | UI: Header and TimeBar | Header and TimeBar, stills checked |
 | 08 | 2 | done | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | Rail, stills checked |
-| 09 | 2 | todo | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | - |
+| 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
 | 10 | 2 | todo | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | - |
 | 11 | 2 | todo | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | - |
 | 12 | 2 | todo | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | - |
@@ -298,3 +299,16 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - KeyCap is used with startFrame -1000 so keys are fully settled on any frame.
 - Focus names occupied: rail, bandPlates, blinkControls, layers, keys.
 - Requests for shared files: none. Note for patch 09: FilmApp passes SkyViewer only `state.viewer`, so read `showKnown`, `showMask` and `band` through useFilmState (import it carefully: filmState.ts imports SkyViewer, so move VIEWER_DEFAULT and the state type into src/ui/viewer/ and re-export them to avoid an import cycle).
+
+### PATCH 09 (SkyViewer) - done
+
+- Files: src/ui/SkyViewer.tsx, src/ui/viewer/{state,geometry,data,wcs,parallax,tiles,rail,Rulers,Hud,Overlay}, src/dev/sheets/DevSkyViewer.tsx, and a CSS block at the end of src/ui/theme.css between `.sb-viewer-begin{}` and `.sb-viewer-end{}`.
+- Public API: `SkyViewer({state, showKnown?, showMask?})`, `VIEWER_DEFAULT`, `SkyViewerState`, `tileToFigure(state, col, row)` (position inside the figure box) and `tileToApp(state, col, row)` (logical app coordinates 0..1600 x 0..900). `col,row` are tile pixel-centre coordinates, the same convention as the pick (602, 318); everything is drawn at col+0.5.
+- FINAL slice fields: fieldId string "pallas"; pairA, pairB frame ids "" (empty means the evidence pair for pallas, first and last D1 frame for pallas-6mo); blinkPhase 0 (below 0.5 shows A, otherwise B, hard switch); zoom 1; cx, cy 0.5; selection null; overlayAB false; view "sky"; refBlend 0; pxDrawAu null; markA, markB null; reveal 1; ADDED refLayer "dss2" ("dss2", "2mass" or "wise", file public/ref/<fieldId>/<refLayer>.jpg); ADDED coach false (the Space / O / arrows hint bar of the app).
+- Focus names occupied: figure (the component positions itself at FOCUS.figure; the sky picture is skyImage and the caption is caption).
+- Tiles are decoded once with the app's own no-data mask (5x5 opening of the zero pixels) and drawn pixelated; the shared-footprint mask follows rail.showMask and the A and B pair is built with the app's pair() rules (amber 1.0, 0.62, 0.22 and cyan 0.2, 0.74, 1.0, additive). Known object ring, dashed track and label "(2) Pallas (known asteroid)" follow rail.showKnown and the displayed frame (field pallas only, evidence has no track for pallas-6mo).
+- Planet X track: the app's exact parallax model (Earth from evidence.orrery, linear in time) from the field centre over the band's frames, label "Planet X @ <n> AU (simulated)". When the band spans the evidence window the track is scaled so its length equals selectShift(n).windowArcsec (the model agrees with the table to 0.09 percent); other distances use the model alone. Drawn solid violet like the app, not dashed.
+- Selection: the app's crosshair (gap 10 tile px, ring r 10) plus a small centre cross. markA and markB: amber and cyan rings with an A or B badge and a faint dashed line between them. All strokes are constant in screen pixels (width times tile pixels per screen pixel), so zoom does not thicken them.
+- Rulers, compass, scale bar and caption are ports of axes.js. The WCS is built from the evidence field centre and size (TAN, crpix 512.5); it reproduces the 13 target positions of evidence within 0.006 px and the pick centroid to the printed RA and Dec. view "solar" dims the rulers, hides the sky furniture and shows a dark orrery placeholder; PanelOrrery owns anything drawn there.
+- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevSkyViewer renders zoom 1 phase 0 and 0.9 (the Pallas ring jumps, stars identical), overlay with coach bar, zoom 3 at the pick with selection, marks and Planet X 500 AU; extra states checked: reference blend, practice field, solar. SpherexFilm frames 598 and 1100 render with the viewer in place.
+- Requests for shared files: none. The Rail flags are read inside the viewer with useFilmState because FilmApp passes only the viewer slice; src/ui/viewer/rail.ts is the only place that does it and the circular import with filmState is safe because SkyViewer.tsx re-exports the slice from viewer/state first.

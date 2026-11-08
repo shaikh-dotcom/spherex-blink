@@ -1,4 +1,9 @@
 {
+  "10": {
+    "state": "done",
+    "note": "Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked",
+    "at": "2026-11-08"
+  },
   "13": {
     "state": "done",
     "note": "S0 Hook scene",

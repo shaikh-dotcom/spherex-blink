@@ -46,20 +46,21 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **40%** by effort weight (69 of 173 units; 0 more in progress)
-- Patches: 14 done, 0 in progress, 0 blocked, 12 not started (of 26)
+- Work done: **46%** by effort weight (79 of 173 units; 0 more in progress)
+- Patches: 15 done, 0 in progress, 0 blocked, 11 not started (of 26)
 - Film scenes finished: 1320 of 4500 frames (29%)
-- Work left: 104 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work left: 94 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **10** UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) (weight 10; owns src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx)
 - **11** UI: Context pane (PanelContext, SkyMapCard) (weight 8; owns src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx)
 - **12** UI: Planet X pane (PanelPlanetX, PanelOrrery) (weight 10; owns src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx)
 - **15** Scene S2 Data (weight 8; owns src/scenes/S2Data.tsx)
 - **16** Scene S3 Blink (weight 10; owns src/scenes/S3Blink.tsx)
+- **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
+- **20** Scene S7 Flag (weight 8; owns src/scenes/S7Flag.tsx)
 
 ### Every patch
 
@@ -75,7 +76,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 07 | 2 | done | 6 | 00, 01 | UI: Header and TimeBar | Header and TimeBar, stills checked |
 | 08 | 2 | done | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | Rail, stills checked |
 | 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
-| 10 | 2 | todo | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | - |
+| 10 | 2 | done | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked |
 | 11 | 2 | todo | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | - |
 | 12 | 2 | todo | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | - |
 | 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
@@ -312,3 +313,18 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Rulers, compass, scale bar and caption are ports of axes.js. The WCS is built from the evidence field centre and size (TAN, crpix 512.5); it reproduces the 13 target positions of evidence within 0.006 px and the pick centroid to the printed RA and Dec. view "solar" dims the rulers, hides the sky furniture and shows a dark orrery placeholder; PanelOrrery owns anything drawn there.
 - Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevSkyViewer renders zoom 1 phase 0 and 0.9 (the Pallas ring jumps, stars identical), overlay with coach bar, zoom 3 at the pick with selection, marks and Planet X 500 AU; extra states checked: reference blend, practice field, solar. SpherexFilm frames 598 and 1100 render with the viewer in place.
 - Requests for shared files: none. The Rail flags are read inside the viewer with useFilmState because FilmApp passes only the viewer slice; src/ui/viewer/rail.ts is the only place that does it and the circular import with filmState is safe because SkyViewer.tsx re-exports the slice from viewer/state first.
+
+### PATCH 10 (Inspect pane) - done
+
+- Files: src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx, CSS block `.sb-inspect-begin{}` at the end of src/ui/theme.css.
+- Public API: `PanelTabs`, `TABS_DEFAULT`, `PanelTabsState`; `PanelInspect`, `INSPECT_DEFAULT`, `PanelInspectState`, `INSPECT_SPLIT` (556, the y where the Inspect card ends and the flag section starts); `PanelFlags`, `FLAGS_DEFAULT`, `PanelFlagsState`.
+- Layout: each component positions itself absolutely in the panel, like the other UI patches. PanelTabs fills the `tabs` rect. PanelInspect runs from the bottom of the tabs (y 120) to INSPECT_SPLIT; PanelFlags runs from INSPECT_SPLIT to the panel bottom (y 900). The Selected point card keeps the app's real spacing (the 8 rows end at about y 396, inside inspectMeta; the Mover check box ends at about y 511 for "moves", inside moverCheck). The flag section is compacted to fit the 344 px left under the panel: Flag a mover card about y 556-748, Flags in this field card about y 748-896.
+- PanelTabs slice (final): `tab: "inspect" | "context" | "planetx"` ("inspect"; the underline is drawn under the active tab, no motion), `reveal: number` (1; fades and lifts the strip).
+- PanelInspect slice (final): `reveal: number` (0; 0 shows the app's empty-state sentence, 1 shows the Selected point rows from selectPick; the empty sentence is gone by 0.5), `verdict: null | "none" | "fixed" | "moves" | "unclear"` (null; null draws nothing in the Mover check block), `verdictReveal: number` (0; fades and lifts the Mover check block). Verdict wording is the app's (controls.js verdict()). "moves" and "fixed" use pick.moverCheck.otherFrames as n. "unclear" uses the app's cosmic-ray sentence with the same n, because the same-frame and fainter-frame counts the other unclear wording needs are not in the evidence. "none" is the app's no-source sentence. Only "moves" is used in the film.
+- PanelFlags slice (final): `formReveal: number` (0; fades the Flag a mover card and the Flags in this field card, with the flag-mode pill), `category: string` ("asteroid"; must be in selectFlagCategories, else it throws), `flagged: number` (0; 0 or 1, more throws because only the pick has evidence; 1 adds the list row, the status line and the match note), `matchReveal: number` (0; fades the match note, shown only when flagged is 1), `exportReveal: number` (0; fades the Export CSV, Export JSON buttons and the CSV preview strip), ADDED `exportPulse: number` (0; 0..1 amber ring and glow on both export buttons), ADDED `statePulse: number` (0; 0..1 ring around the pill and status line).
+- Wording from the app: pill "saved in this browser only", status "Saved in this browser (no shared store is configured)." (shown once flagged is 1), match note "This matches a known object: (2) Pallas (1″ away). Good catch. It is catalogued, so it is not a new discovery." The distance is built the way the app builds it: distance between the pick centroid and selectTargetPosition(pick.frame) times pixscaleArcsec, rounded to whole arcseconds; the bible quote leaves the "(N″ away)" part out, the app prints it. Nothing says flags are shared.
+- Flag row: category from state, band, frame id with the underscore as a space, verdict "moves" from pick.moverCheck.goneFromAll, coordinates to four decimals, as the app builds them. CSV preview: the header is selectFlagColumns; the data row is built from the pick and stops before `created`, because the app writes a wall-clock ISO time there and the evidence has none. Nothing is invented for that cell.
+- Anchors (data-anchor): tabs, tabInspect, tabContext, tabPlanetX, inspectCard, inspectMeta, moverCheck, flagPanel, flagForm, categorySelect, noteField, flagIt, flagState, flagMatch, flagList, exportCsv, exportJson, csvPreview.
+- Focus names occupied: tabs, inspectMeta, moverCheck, flagForm, flagList.
+- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; DevInspect stills reviewed at 0.6 and 1.0 scale: nothing selected, selected with verdict "moves", form shown, flagged with match note, export shown with pulse, state pill pulse, verdicts fixed, unclear and none, half reveal; the four-line "unclear" verdict fits above the split.
+- Requests for shared files: (1) src/config/focus.ts: the flag rects do not match the real layout, set flagForm to {x: 1208, y: 556, w: 392, h: 192} and flagList to {x: 1208, y: 748, w: 392, h: 148}; inspectMeta and moverCheck are fine. (2) src/ui/FilmApp.tsx: the empty `panel` div draws nothing, so the right panel has no background or left rule; give it `boxSizing: "border-box"`, `borderLeft: 1px solid theme.rule2` and `background: linear-gradient(180deg, rgba(11,13,20,0.9), rgba(6,7,11,0.96))` (no backdrop-filter), as DevInspect does.

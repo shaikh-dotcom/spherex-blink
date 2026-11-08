@@ -4,7 +4,7 @@ Deterministic Remotion motion video (1920x1080, 30 fps, 4500 frames = 150 s) for
 
 Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status and the handoff entries of finished patches), docs/bible/bible-04.md (frozen contract), then your patch in docs/patches/patch-NN.md. `node tools/make-prompt.mjs NN` builds a ready prompt in prompts-out/.
 
-## 1. Status: 20 of 26 patches done (about 72 percent of the effort, 2940 of 4500 scene frames)
+## 1. Status: 21 of 26 patches done (about 76 percent of the effort, 3300 of 4500 scene frames)
 
 | Patch | What | State |
 |---|---|---|
@@ -14,7 +14,7 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 03 | gfx ParallaxDiagram + LimitsCard | DONE |
 | 04 | Audio: make-sfx.mjs, sfx.ts (71 cues), FilmAudio | DONE |
 | 05 | render.mjs, check-stills.mjs | DONE and audited (`--cut30` verified at 900 frames, `--4k` verified) |
-| 06 | make-sheets.mjs, tools/audit-motion.mjs | DONE and audited (audit passes on every finished scene; S5 to S7 are still stubs and fail the hold check) |
+| 06 | make-sheets.mjs, tools/audit-motion.mjs | DONE and audited (audit passes on every finished scene; S5 and S6 are still stubs and fail the hold check) |
 | 13, 14 | Scenes S0 Hook, S1 Title | DONE (stills checked, motion audit clean; S1 was coded against the bible-04 slice table because UI patches 07-12 are not finished, patch 23 rechecks it) |
 | 21, 22 | Scenes S8 Limits, S9 Outro | DONE (stills checked, motion audit clean; Request for patch 23 in the ledger: fade Grain and Vignette over 4470-4499) |
 | 07, 08 | UI: Header+TimeBar, Rail | DONE (stills checked on DevHeaderTime and DevRail; TimeBar and Rail slices gained a `fieldId` field, see the ledger) |
@@ -25,16 +25,16 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 15 | Scene S2 Data | DONE (tsc clean; motion audit passes; stills at the cue frames checked; final shot is `centre` at zoom 1.3 so the time bar stays visible, see the ledger) |
 | 16 | Scene S3 Blink | DONE (tsc clean; motion audit passes; stills at the cue frames and the blink A and B frames checked; the jump callout aims at the midpoint of the A and B asteroid positions, see the ledger) |
 | 17 | Scene S4 Inspect | DONE (tsc clean; motion audit passes; stills at the cue frames checked; wide whole-window shots at the untick, snap and re-tick so the rail tick box and the card are in frame, see the ledger) |
-| 20 | Scene S7 | TODO, can start now (09, 10 done) |
+| 20 | Scene S7 Flag | DONE (tsc clean; motion audit passes; stills at the cue frames checked; click at f3474 with flag at f3478; last shot stays on flagList so the caption sits on clear ground; Requests for patch 23 in the ledger: flag rects and the S8 cursor hide waypoint) |
 | 18 | Scene S5 | TODO, can start now (09, 11 done) |
 | 19 | Scene S6 | TODO, can start now (03, 09, 12 done) |
 | 23 | Continuity and motion pass | TODO after all scenes and 06 |
 | 24 | Audio sync and mix | TODO after 04 (done) and 23 |
 | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
 
-Remaining: 48 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
+Remaining: 40 of 173 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25.
 
-Ready now, all parallel (separate sessions or models): 18, 19, 20. Run `node tools/ledger.mjs next` for the live list.
+Ready now, all parallel (separate sessions or models): 18, 19. Run `node tools/ledger.mjs next` for the live list.
 
 ## 2. What exists
 
@@ -42,7 +42,7 @@ Ready now, all parallel (separate sessions or models): 18, 19, 20. Run `node too
 - src/data: evidence.json (REAL capture, spherex-blink commit f525fd5), types, select (typed selectors).
 - src/fx, src/lib: motion toolkit. src/gfx: HookField, Mark, ParallaxDiagram, LimitsCard (finished). src/audio/FilmAudio.tsx (finished).
 - src/ui: SkyViewer (+ src/ui/viewer/*) is FINISHED (patch 09; exports `tileToFigure` and `tileToApp` for aiming callouts). Header, TimeBar and Rail are FINISHED (patches 07, 08). PanelTabs, PanelInspect and PanelFlags are FINISHED (patch 10; PanelInspect exports `INSPECT_SPLIT`). PanelContext and SkyMapCard are FINISHED (patch 11). PanelPlanetX and PanelOrrery are FINISHED (patch 12). FilmApp.tsx is already wired.
-- src/scenes: S0Hook, S1Title, S2Data, S3Blink, S4Inspect, S8Limits and S9Outro are FINISHED (patches 13, 14, 15, 16, 17, 21, 22). S5Check ... S7Flag are STUBS exporting `SN_CAMERA`, `SN_CURSOR`, `SN_STATE` and an overlay; index.ts wires all of them.
+- src/scenes: S0Hook, S1Title, S2Data, S3Blink, S4Inspect, S7Flag, S8Limits and S9Outro are FINISHED (patches 13, 14, 15, 16, 17, 20, 21, 22). S5Check and S6PlanetX are STUBS exporting `SN_CAMERA`, `SN_CURSOR`, `SN_STATE` and an overlay; index.ts wires all of them.
 - scripts: make-sheets (`npm run sheets -- --scene S3 --every 4`), capture-evidence, validate-evidence (`--final`), fetch-assets, make-sfx (`npm run sfx`, `sfx:check`), render (`--4k`, `--frames`, `--cut30`, `--from/--to`, `--browser`), check-stills.
 - tools: audit-motion.mjs (`npm run motion`, run it after every scene patch), ledger.mjs (`sync|status|next|start|done|block|check`), make-prompt.mjs, lib.mjs, shots.mjs (render named stills of any composition: `node tools/shots.mjs SpherexFilm 300,600 out/shots 0.5 <chrome>`).
 - docs: guide/ (context-header, motion-rules, checklist, 00-read-first), bible/ 01-11 + appendix-A, patches/ 00-25, LEDGER.md.
@@ -73,10 +73,10 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
 2. `evidence:final-check` prints two WARN lines (pair "chosen by rule"). Expected; the pair was verified by replication, not by clicking the live app. Optionally press Best pair in the live app (field Pallas patch, band D1) to confirm.
 3. LimitsCard has no Ceres row on purpose (the app does not explain Ceres). Patch 21 did not add one.
 4. Check the Space Apps submission page for any video length limit; none was found in the judging guide.
-5. Patch 06 was audited on S0, S1, S8, S9 and on synthetic camera tracks; S2, S3 and S4 pass too, S5 to S7 are still stubs. Re-run `npm run motion` after each scene patch.
+5. Patch 06 was audited on S0, S1, S8, S9 and on synthetic camera tracks; S2, S3, S4 and S7 pass too, S5 and S6 are still stubs. Re-run `npm run motion` after each scene patch.
 
 ## 6. Next steps for whoever continues
 
 1. `npm install`, `npm run assets -- --from ../spherex-blink`, `npm run sfx`.
-2. Run the scenes S5, S6 and S7 (18, 19, 20; 19 is on the critical path), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
+2. Run the scenes S5 and S6 (18, 19; 19 is on the critical path), in parallel where possible: `node tools/ledger.mjs start NN`, build the prompt, apply the result, run the patch's CHECK, `node tools/ledger.mjs done NN "note"`, add a ledger block.
 3. Then 23, 24, 25.

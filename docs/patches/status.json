@@ -41,6 +41,11 @@
     "note": "Scene S4 Inspect",
     "at": "2026-11-08"
   },
+  "20": {
+    "state": "done",
+    "note": "Scene S7 Flag",
+    "at": "2026-11-08"
+  },
   "21": {
     "state": "done",
     "owner": "",

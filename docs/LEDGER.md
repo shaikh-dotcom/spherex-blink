@@ -43,15 +43,14 @@ See docs/bible/bible-04.md: FilmState slices per UI file, the scene file contrac
 ## Status
 
 <!-- STATUS:BEGIN -->
-
 Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run the command after every state change.
 
 ### Progress
 
-- Work done: **72%** by effort weight (125 of 173 units; 0 more in progress)
-- Patches: 20 done, 0 in progress, 0 blocked, 6 not started (of 26)
-- Film scenes finished: 2940 of 4500 frames (65%)
-- Work left: 48 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work done: **77%** by effort weight (133 of 173 units; 0 more in progress)
+- Patches: 21 done, 0 in progress, 0 blocked, 5 not started (of 26)
+- Film scenes finished: 3300 of 4500 frames (73%)
+- Work left: 40 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
@@ -59,38 +58,37 @@ These can all run at the same time in separate sessions: they need only finished
 
 - **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
 - **19** Scene S6 Planet X (weight 12; owns src/scenes/S6PlanetX.tsx)
-- **20** Scene S7 Flag (weight 8; owns src/scenes/S7Flag.tsx)
 
 ### Every patch
 
-| ID  | Wave | State | Weight | Needs                                      | Title                                                                  | Owner / note                                                                                                  |
-| --- | ---- | ----- | ------ | ------------------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 00  | 0    | done  | 3      | -                                          | Starter repo (scaffold, config, FX toolkit, evidence, contract, tools) | starter repo                                                                                                  |
-| 01  | 1    | done  | 1      | 00                                         | Fetch assets: fonts, tiles, reference pictures (human step, no model)  | assets fetched, pair confirmed by re-implementing bestPair                                                    |
-| 02  | 1    | done  | 4      | 00                                         | Graphics: HookField (S0 star field) and Mark (logo)                    | HookField and Mark                                                                                            |
-| 03  | 1    | done  | 6      | 00                                         | Graphics: ParallaxDiagram (S6) and LimitsCard (S8)                     | ParallaxDiagram and LimitsCard                                                                                |
-| 04  | 1    | done  | 6      | 00                                         | Audio engine: sfx cue list, generator script, FilmAudio                | audio engine                                                                                                  |
-| 05  | 1    | done  | 5      | 00                                         | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs  | render and check-stills; audited, cut30 verified at 900 frames, 4k verified                                   |
-| 06  | 1    | done  | 5      | 00                                         | Tooling: contact sheets and motion audit                               | make-sheets and audit-motion; audited                                                                         |
-| 07  | 2    | done  | 6      | 00, 01                                     | UI: Header and TimeBar                                                 | Header and TimeBar, stills checked                                                                            |
-| 08  | 2    | done  | 6      | 00, 01                                     | UI: Rail (band plates, Blink controls, Layers, Keys)                   | Rail, stills checked                                                                                          |
-| 09  | 2    | done  | 10     | 00, 01                                     | UI: SkyViewer (blink canvas, overlays, selection, Planet X track)      | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
-| 10  | 2    | done  | 10     | 00, 01                                     | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags)                 | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked                                             |
-| 11  | 2    | done  | 8      | 00, 01                                     | UI: Context pane (PanelContext, SkyMapCard)                            | Context pane: PanelContext, SkyMapCard; stills checked                                                        |
-| 12  | 2    | done  | 10     | 00, 01                                     | UI: Planet X pane (PanelPlanetX, PanelOrrery)                          | Planet X pane: PanelPlanetX, PanelOrrery; stills checked                                                      |
-| 13  | 2    | done  | 5      | 02                                         | Scene S0 Hook                                                          | S0 Hook scene                                                                                                 |
-| 14  | 2    | done  | 3      | 02                                         | Scene S1 Title                                                         | S1 Title scene                                                                                                |
-| 15  | 3    | done  | 8      | 07, 08, 09                                 | Scene S2 Data                                                          | Scene S2 Data                                                                                                 |
-| 16  | 3    | done  | 10     | 07, 08, 09                                 | Scene S3 Blink                                                         | Scene S3 Blink                                                                                                |
-| 17  | 3    | done  | 10     | 09, 10                                     | Scene S4 Inspect                                                       | Scene S4 Inspect                                                                                              |
-| 18  | 3    | todo  | 8      | 09, 11                                     | Scene S5 Check                                                         | -                                                                                                             |
-| 19  | 3    | todo  | 12     | 03, 09, 12                                 | Scene S6 Planet X                                                      | -                                                                                                             |
-| 20  | 3    | todo  | 8      | 09, 10                                     | Scene S7 Flag                                                          | -                                                                                                             |
-| 21  | 2    | done  | 6      | 03                                         | Scene S8 Limits                                                        | S8 Limits scene                                                                                               |
-| 22  | 2    | done  | 3      | 02                                         | Scene S9 Outro                                                         | S9 Outro scene                                                                                                |
-| 23  | 4    | todo  | 8      | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean)                | -                                                                                                             |
-| 24  | 5    | todo  | 6      | 04, 23                                     | Audio sync and mix                                                     | -                                                                                                             |
-| 25  | 6    | todo  | 6      | 05, 06, 24                                 | Final QA, renders and submission assets                                | -                                                                                                             |
+| ID | Wave | State | Weight | Needs | Title | Owner / note |
+|----|------|-------|--------|-------|-------|--------------|
+| 00 | 0 | done | 3 | - | Starter repo (scaffold, config, FX toolkit, evidence, contract, tools) | starter repo |
+| 01 | 1 | done | 1 | 00 | Fetch assets: fonts, tiles, reference pictures (human step, no model) | assets fetched, pair confirmed by re-implementing bestPair |
+| 02 | 1 | done | 4 | 00 | Graphics: HookField (S0 star field) and Mark (logo) | HookField and Mark |
+| 03 | 1 | done | 6 | 00 | Graphics: ParallaxDiagram (S6) and LimitsCard (S8) | ParallaxDiagram and LimitsCard |
+| 04 | 1 | done | 6 | 00 | Audio engine: sfx cue list, generator script, FilmAudio | audio engine |
+| 05 | 1 | done | 5 | 00 | Tooling: render.mjs (full, 4k, frames, 30 s cut) and check-stills.mjs | render and check-stills; audited, cut30 verified at 900 frames, 4k verified |
+| 06 | 1 | done | 5 | 00 | Tooling: contact sheets and motion audit | make-sheets and audit-motion; audited |
+| 07 | 2 | done | 6 | 00, 01 | UI: Header and TimeBar | Header and TimeBar, stills checked |
+| 08 | 2 | done | 6 | 00, 01 | UI: Rail (band plates, Blink controls, Layers, Keys) | Rail, stills checked |
+| 09 | 2 | done | 10 | 00, 01 | UI: SkyViewer (blink canvas, overlays, selection, Planet X track) | SkyViewer: tile canvases, blink, overlay, known layer, selection, marks, Planet X track, rulers, HUD, caption |
+| 10 | 2 | done | 10 | 00, 01 | UI: Inspect pane (PanelTabs, PanelInspect, PanelFlags) | Inspect pane: PanelTabs, PanelInspect, PanelFlags; stills checked |
+| 11 | 2 | done | 8 | 00, 01 | UI: Context pane (PanelContext, SkyMapCard) | Context pane: PanelContext, SkyMapCard; stills checked |
+| 12 | 2 | done | 10 | 00, 01 | UI: Planet X pane (PanelPlanetX, PanelOrrery) | Planet X pane: PanelPlanetX, PanelOrrery; stills checked |
+| 13 | 2 | done | 5 | 02 | Scene S0 Hook | S0 Hook scene |
+| 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
+| 15 | 3 | done | 8 | 07, 08, 09 | Scene S2 Data | Scene S2 Data |
+| 16 | 3 | done | 10 | 07, 08, 09 | Scene S3 Blink | Scene S3 Blink |
+| 17 | 3 | done | 10 | 09, 10 | Scene S4 Inspect | Scene S4 Inspect |
+| 18 | 3 | todo | 8 | 09, 11 | Scene S5 Check | - |
+| 19 | 3 | todo | 12 | 03, 09, 12 | Scene S6 Planet X | - |
+| 20 | 3 | done | 8 | 09, 10 | Scene S7 Flag | Scene S7 Flag |
+| 21 | 2 | done | 6 | 03 | Scene S8 Limits | S8 Limits scene |
+| 22 | 2 | done | 3 | 02 | Scene S9 Outro | S9 Outro scene |
+| 23 | 4 | todo | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | - |
+| 24 | 5 | todo | 6 | 04, 23 | Audio sync and mix | - |
+| 25 | 6 | todo | 6 | 05, 06, 24 | Final QA, renders and submission assets | - |
 
 ### Waves: what runs in parallel and what runs in order
 
@@ -148,7 +146,7 @@ A wave number is only the earliest wave a patch could run in. A patch may start 
 No ownership conflicts: every file or folder below is written by exactly one patch.
 
 - 00: (the starter zip)
-- 01: public/\*
+- 01: public/*
 - 02: src/gfx/HookField.tsx, src/gfx/Mark.tsx, src/dev/sheets/DevGfxHook.tsx
 - 03: src/gfx/ParallaxDiagram.tsx, src/gfx/LimitsCard.tsx, src/dev/sheets/DevGfxExplain.tsx
 - 04: src/config/sfx.ts, src/audio/FilmAudio.tsx, scripts/make-sfx.mjs
@@ -156,7 +154,7 @@ No ownership conflicts: every file or folder below is written by exactly one pat
 - 06: scripts/make-sheets.mjs, tools/audit-motion.mjs
 - 07: src/ui/Header.tsx, src/ui/TimeBar.tsx, src/dev/sheets/DevHeaderTime.tsx
 - 08: src/ui/Rail.tsx, src/dev/sheets/DevRail.tsx
-- 09: src/ui/SkyViewer.tsx, src/ui/viewer/\*, src/dev/sheets/DevSkyViewer.tsx
+- 09: src/ui/SkyViewer.tsx, src/ui/viewer/*, src/dev/sheets/DevSkyViewer.tsx
 - 10: src/ui/PanelTabs.tsx, src/ui/PanelInspect.tsx, src/ui/PanelFlags.tsx, src/dev/sheets/DevInspect.tsx
 - 11: src/ui/PanelContext.tsx, src/ui/SkyMapCard.tsx, src/dev/sheets/DevContext.tsx
 - 12: src/ui/PanelPlanetX.tsx, src/ui/PanelOrrery.tsx, src/dev/sheets/DevPlanetX.tsx
@@ -172,7 +170,7 @@ No ownership conflicts: every file or folder below is written by exactly one pat
 - 22: src/scenes/S9Outro.tsx
 - 23: src/config/timeline.ts, src/config/copy.ts, src/config/focus.ts, src/config/theme.ts, src/config/filmState.ts, src/scenes/index.ts, src/SpherexFilm.tsx
 - 24: docs/bible/bible-09.md
-- 25: docs/submission/_, out/_
+- 25: docs/submission/*, out/*
 <!-- STATUS:END -->
 
 ## Handoff entries

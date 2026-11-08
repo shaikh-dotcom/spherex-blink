@@ -46,16 +46,15 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-08. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **66%** by effort weight (115 of 173 units; 0 more in progress)
-- Patches: 19 done, 0 in progress, 0 blocked, 7 not started (of 26)
-- Film scenes finished: 2400 of 4500 frames (53%)
-- Work left: 58 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
+- Work done: **72%** by effort weight (125 of 173 units; 0 more in progress)
+- Patches: 20 done, 0 in progress, 0 blocked, 6 not started (of 26)
+- Film scenes finished: 2940 of 4500 frames (65%)
+- Work left: 48 effort units. Longest remaining chain: 19 -> 23 -> 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **17** Scene S4 Inspect (weight 10; owns src/scenes/S4Inspect.tsx)
 - **18** Scene S5 Check (weight 8; owns src/scenes/S5Check.tsx)
 - **19** Scene S6 Planet X (weight 12; owns src/scenes/S6PlanetX.tsx)
 - **20** Scene S7 Flag (weight 8; owns src/scenes/S7Flag.tsx)
@@ -81,7 +80,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 14 | 2 | done | 3 | 02 | Scene S1 Title | S1 Title scene |
 | 15 | 3 | done | 8 | 07, 08, 09 | Scene S2 Data | Scene S2 Data |
 | 16 | 3 | done | 10 | 07, 08, 09 | Scene S3 Blink | Scene S3 Blink |
-| 17 | 3 | todo | 10 | 09, 10 | Scene S4 Inspect | - |
+| 17 | 3 | done | 10 | 09, 10 | Scene S4 Inspect | Scene S4 Inspect |
 | 18 | 3 | todo | 8 | 09, 11 | Scene S5 Check | - |
 | 19 | 3 | todo | 12 | 03, 09, 12 | Scene S6 Planet X | - |
 | 20 | 3 | todo | 8 | 09, 10 | Scene S7 Flag | - |
@@ -385,3 +384,16 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Checked: `npx tsc --noEmit` clean; motion audit as above; stills at f1080, 1110, 1136, 1140, 1170, 1200, 1215, 1230, 1250, 1290, 1380, 1410, 1440, 1590, 1605, 1630, 1650, 1679 pass check-stills and the unreviewed ones were looked at (jump callout at an A frame and a B frame, Pluto caption, Best pair caption with the rail pair line "D1 - 1.36 days apart" lit, Judge by position callout). Stills were rendered with audio missing (`npm run sfx` not run), which only logs a 404 for the manifest.
 - Deviations: (1) the Best pair caption has no sub line with the pair dates and wavelengths; it collided with the app's own figure caption and was unreadable, so it was removed. (2) The Pluto and Best pair captions sit over the figure caption and the viewer toolbar row; they stay legible at 64 px, same situation as S2, so the size was not lowered.
 - Requests for shared files: none to edit. For patch 23 to judge: (1) the Overlay button is not clicked by the cursor, the mode switches by state only at f1290; (2) the badge is placed top-centre at stage y 62 and does not follow the header badge position; (3) no caption sub line for the pair (see Deviations); (4) if a callout variant with a separate chip anchor and dot anchor is ever added to src/fx/Callout.tsx, the jump callout could keep the chip still and put the dot on the live asteroid.
+
+### PATCH 17 (Scene S4 Inspect) - done
+
+- File: src/scenes/S4Inspect.tsx (replaces the stub; exports exactly S4_CAMERA, S4_CURSOR, S4_STATE, S4Inspect).
+- Camera (real moves 36 frames each on beats f1680, 1740, 1800, 1875, 1935, 2010, drifts of 24 to 173 frames between them, longest hold 24 frames, gaps 24 or more): fullWindow 1.16 at f1680 (from the S3 exit pose), drift to 1.19; skyImage 1.6 at f1740, drift to 1.66; fullWindow 1.16 at f1800, drift to 1.19; moverCheck 2.1 at f1875 (the card shot, the only one above 2.0, audit max 2.11, under the 60 frame limit); inspectMeta 1.85 at f1935, drift to 1.93; fullWindow 1.16 at f2010, slow push to 1.19 at f2219. `bias()` throws above 2.0 (2.3 for the card shot). `node tools/audit-motion.mjs --scene S4` passes (0 failures, 0 warnings); the full audit now fails only on the S5, S6 and S7 stubs.
+- Cue frames used: CUES.s4.caption 1680 (s4.caption, out at 1755), calloutBlind 1710 (aimed at the Known objects tick box, side right, lead 290 so the chip clears the rail, out at 1770), calloutSnap 1800 (aimed at the centroid, out at 1860), calloutMover 1890 (focus moverCheck, side left, out at 1950), captionKnown 2100 (out at 2190). Other frames: viewer zoom in f1740-1764, click selection f1770, snap slide f1800-1812, inspect.reveal f1800-1845, verdictReveal f1890-1920, viewer zoom out f2004-2040.
+- Slice fields set every frame: appOpacity 1; header fieldId "pallas", badge "real"; rail fieldId "pallas", band = pair band (D1), mode "static", rateHz 3, showKnown false f1710-2099 and true otherwise, showMask true, hot "layers" f1690-1769 and f2084-2149 (else null); viewer fieldId "pallas", pairA and pairB from selectPair, blinkPhase 0 (frame A, which is the pick's frame), zoom 1 to 2.4 and back with cx and cy moving to the centroid (cx = (602.38 + 0.5) / 1024, cy = (318.21 + 0.5) / 1024), selection null before f1770, then the click point, then the centroid, overlayAB false, view "sky", refBlend 0, pxDrawAu null, markA and markB null, reveal 1, coach false; time fieldId "pallas", position 0, epochSeg null, reveal 1; tabs tab "inspect", reveal 1; inspect reveal 0 to 1, verdict "moves" (constant; invisible until verdictReveal rises), verdictReveal 0 to 1.
+- Entry state: as S3 exit. Exit state reached by the last 30 frames: viewer.selection = the pick centroid, inspect verdict "moves" with reveal 1 and verdictReveal 1, rail.showKnown true, tabs.tab "inspect", viewer zoom 1.
+- Click pixel: pick.pixel plus (4, 4) = (606, 322), 5.2 tile pixels from the centroid (602.38, 318.21); the selection slides to the centroid with the signature ease over 12 frames.
+- Cursor (clicks 4 frames before each reaction): appears at f1684, clicks the Known objects label at f1706 (tick box clears at f1710), travels to the click pixel and clicks at f1766 (selection at f1770), moves aside at f1812 so it does not cover the snap, returns and clicks the label at f2096 (known layer back at f2100), hides at f2160. The tick box position is derived from the layers focus rect (label row 18 px plus 8 px gap, so the box centre is at layers.y + 35); there is no focus rect of its own.
+- Checked: `npx tsc --noEmit` clean; stills at f1680, 1706, 1712, 1745, 1768, 1772, 1800, 1806, 1830, 1895, 1905, 1950, 2025, 2090, 2102, 2130, 2219 pass check-stills and the key ones were looked at (untick with callout and no ring or track, click with the crosshair on the dot, snap with the card revealed beside it, the verdict close-up with the app's own wording, zoom-out, re-tick with ring, track and label back, final hold). Stills were rendered without audio files (`npm run sfx` not run).
+- Deviations: (1) the untick, the snap with the card reveal, and the re-tick use whole-window shots (fullWindow, scale 1.16 to 1.19) instead of `figure` or a tight `skyImage` framing: the Known objects tick box sits in the rail, which a figure or skyImage framing crops out, and the snap and the card reveal land on the same beat so they need to be in one frame; the last shot stays wide to f2219 for the same reason. (2) The known layer comes back in one frame at f2100: the viewer has no draw-on progress, so "the layer draws itself" is a hard appearance with the caption and the ticking cursor. (3) The captions sit over the app's figure caption, as in S2 and S3.
+- Requests for shared files: none to edit. For patch 23 to judge: (1) add a `knownReveal` field (0 to 1) to the viewer slice and have Overlay draw the ring, track and label progressively, so the re-tick can draw the layer on; (2) a dedicated focus rect for the Known objects tick box would replace the offsets derived from `layers` in this file.

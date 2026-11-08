@@ -36,6 +36,11 @@
     "note": "Scene S3 Blink",
     "at": "2026-11-08"
   },
+  "17": {
+    "state": "done",
+    "note": "Scene S4 Inspect",
+    "at": "2026-11-08"
+  },
   "21": {
     "state": "done",
     "owner": "",

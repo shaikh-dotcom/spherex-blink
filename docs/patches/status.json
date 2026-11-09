@@ -46,6 +46,11 @@
     "note": "Scene S5 Check",
     "at": "2026-11-08"
   },
+  "19": {
+    "state": "done",
+    "note": "Scene S6 Planet X; tsc clean; motion audit passes on all 10 scenes; stills at the cue frames checked; diagram ends before the lab text reveals; six-month bracket drawn by the scene overlay; orrery shot lifted clear of the caption",
+    "at": "2026-11-09"
+  },
   "20": {
     "state": "done",
     "note": "Scene S7 Flag",

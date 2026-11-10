@@ -32,7 +32,6 @@ export const CAMERA_LIMITS = {
     driftPx: 5,
     floatZoom: 0.004,
     shakeFrames: 8,
-    dofBlurPx: 1.2,
     dofDim: 0.12,
     springSettled: 150,
     defaultMoveFrames: 30,

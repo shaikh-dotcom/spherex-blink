@@ -223,8 +223,6 @@ export const Callout: React.FC<CalloutProps> = ({ text, variant = "note", target
             borderRadius: 12,
             border: `1px solid ${tone.border}`,
             background: fill,
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
             boxShadow: `0 10px 30px -12px ${shade(0.8)}, 0 1px 0 ${edgeLight(0.08)} inset`,
             color: tone.text,
             fontFamily: mono ? fonts.mono : fonts.serif,

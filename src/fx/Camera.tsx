@@ -199,8 +199,6 @@ export const Camera: React.FC<CameraProps> = ({ keyframes, dof = true, wideTilt,
                 height: STAGE.h,
                 pointerEvents: "none",
                 background: veil(CAMERA_LIMITS.dofDim),
-                backdropFilter: `blur(${CAMERA_LIMITS.dofBlurPx}px)`,
-                WebkitBackdropFilter: `blur(${CAMERA_LIMITS.dofBlurPx}px)`,
                 maskImage: hole,
                 WebkitMaskImage: hole,
             }}/>) : null}

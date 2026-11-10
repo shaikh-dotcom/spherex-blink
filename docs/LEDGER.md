@@ -43,7 +43,7 @@ See docs/bible/bible-04.md: FilmState slices per UI file, the scene file contrac
 ## Status
 
 <!-- STATUS:BEGIN -->
-Updated by `node tools/ledger.mjs sync` on 2026-11-09. Do not edit by hand; run the command after every state change.
+Updated by `node tools/ledger.mjs sync` on 2026-11-10. Do not edit by hand; run the command after every state change.
 
 ### Progress
 
@@ -83,7 +83,7 @@ Nothing is ready. Check in-progress and blocked rows below.
 | 20 | 3 | done | 8 | 09, 10 | Scene S7 Flag | Scene S7 Flag |
 | 21 | 2 | done | 6 | 03 | Scene S8 Limits | S8 Limits scene |
 | 22 | 2 | done | 3 | 02 | Scene S9 Outro | S9 Outro scene |
-| 23 | 4 | in-progress | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | stages 1 and 2 of 4 done, next stage 3 (hygiene, honesty check, deferred Requests) |
+| 23 | 4 | in-progress | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | stages 1 to 3 of 4 done, next stage 4 (preview render, contact sheets, done) |
 | 24 | 5 | todo | 6 | 04, 23 | Audio sync and mix | - |
 | 25 | 6 | todo | 6 | 05, 06, 24 | Final QA, renders and submission assets | - |
 
@@ -436,14 +436,14 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Deviations: (1) the diagram ends at f2818, not f2860: it is a stage overlay that cannot follow the camera, and past f2820 it sat over the live lab text. (2) The viewer zoom and the playhead change on the field swaps at f3000 and f3060, so those two changes hide in the app's own field switch. (3) The six-month shift is shown as a bracket, not a track (see above). (4) The honest beat frames orreryCard at 1.25, not the panel, so the solar-system card sits above the lower-third caption and the Clear button stays in frame for the click. (5) The marks are cleared at f3390, not held to the end, so the exit state matches bible-04.
 - Requests for shared files: none to edit. For patch 23 to judge: (1) S7 starts with tabs.tab "inspect" while S6 ends on "planetx"; S7 has no tab click, so check that cut. (2) If per-button focus rects for Mark A, Mark B, Clear and the distance slider are added to src/config/focus.ts, the cursor constants in this file could come from them (the pxDistance rect, y 150 to 220, sits above the real slider track at y 229). (3) Extending the orrery evidence to cover 2025-04 to 2026-04 would let the viewer draw the real six-month track in place of the bracket.
 
-### PATCH 23 (Continuity and motion pass) - STAGES 1 and 2 of 4 done, patch still in progress
+### PATCH 23 (Continuity and motion pass) - STAGES 1 to 3 of 4 done, patch still in progress
 
 Patch 23 is too large for one session, so it runs in four stages. Each stage ends with this block and HANDOFF.md updated. Later stages edit only the "Stage status" list and add their own "Stage N" paragraph; they do not rewrite earlier paragraphs.
 
 Stage status:
 - Stage 1 (spec step 1, plus the step 3 audit and the step 4 check on added lines): DONE.
 - Stage 2 (spec step 2, the nine scene boundaries): DONE (three boundaries fixed, see "Stage 2" below).
-- Stage 3 (spec steps 4 and 5 in full, and the decision on the deferred Requests below): NOT STARTED.
+- Stage 3 (spec steps 4 and 5 in full, and the decision on the deferred Requests below): DONE (see "Stage 3" below).
 - Stage 4 (spec step 6, preview render and contact sheets, then `node tools/ledger.mjs done 23`): NOT STARTED.
 
 Stage 1 - Requests applied (source patch in brackets):
@@ -480,8 +480,22 @@ Method: a throwaway script (not committed) loaded the film modules with the load
 - Entry and exit lines changed in stage 2, and only those: src/scenes/S6PlanetX.tsx (import of S5_STATE, `SWAP_AT`, `INSPECT_TAB_CLICK_AT`, `INSPECT_TAB`, the last S6_CURSOR waypoint, the early return in S6_STATE, the `planetx.reveal` start), src/scenes/S7Flag.tsx (`TAB_FRAMES`, the first S7_CURSOR waypoint, the two inspect ramps) and src/scenes/S8Limits.tsx (import of S7_STATE, S8_STATE). Those scene blocks above (patches 19, 20, 21) still describe the old cursor and entry states; this block overrides them: S6 cursor now ends on the Inspect tab click at f3416 instead of hiding at f3400, and S7 no longer has a cursor fade-in at f3438.
 - Judged and left alone: [14] S2 opens on the S1 end pose (camera and appOpacity continuous at 599|600); [18] S6 opens from fullWindow scale 1.19 (camera continuous at 2699|2700).
 
-Stage 3 - what to do next (spec steps 4 and 5 in full, and the deferred Requests):
-- Step 4 over the whole repo, not just the added lines: grep src, scripts and tools for comments, setTimeout, setInterval, requestAnimationFrame, CSS transitions, Date.now, Math.random (unseeded) and backdrop-filter; `npx tsc --noEmit`.
-- Step 5, the honesty list on real frames: S6 shows the near verdict (about f3180 to f3390), S5 shows both 148/150 and 107/150 (about f2540 to f2610), S7 shows the browser-only wording (pill "saved in this browser only" and the status line), S8 shows the simulated label, and all prototype text is present (the "Prototype, not a discovery tool" badge and footer).
-- Decide the deferred Requests listed above and record each as applied, rejected or left as a note for the final handoff.
+Stage 3 - hygiene, honesty check, deferred Requests (spec steps 4 and 5 in full): DONE.
+Base: the stage 1 and 2 patch had already been committed as f8cfc30 on top of 033b689, so stage 3 is a patch against f8cfc30 and contains only the lines below.
+- Step 4 over the whole repo: `npx tsc --noEmit` clean. grep over src, scripts and tools for setTimeout, setInterval, requestAnimationFrame, Date.now, Math.random, @keyframes, `transition:` and `animation:`: no hits; no comments in src. `new Date(` appears in src/ui/PanelContext.tsx:44 and src/ui/PanelOrrery.tsx:219 (each converts an MJD to a date string, deterministic) and, with no argument, in scripts/capture-evidence.mjs, scripts/render.mjs and tools/ledger.mjs (tooling, not film code); judged fine.
+- Step 4, backdrop-filter: two real uses fixed. (1) src/fx/Camera.tsx, the depth-of-field veil: `backdropFilter` and `WebkitBackdropFilter` removed; the plain dim veil (`veil(CAMERA_LIMITS.dofDim)`) and its mask stay, which is the plain overlay motion rule 10 asks for, so the only visible change is that the area outside the focus hole is no longer softened by 1.2 px. `dofBlurPx` is removed from CAMERA_LIMITS in src/config/camera.ts (no other user). (2) src/fx/Callout.tsx, the chip: `blur(10px)` and its Webkit twin removed; the chip fill is unchanged (glass 0.72 to 0.78 alpha), because stills show the text still reads. src/ui/theme.css lines 43 and 44 only force `backdrop-filter: none` inside `.film-app-layer` and stay. `grep -rn -i backdrop src scripts tools` now returns only those two lines, so the "no backdrop-filter" claim for the S2 cards holds repo-wide.
+- Files outside patch 23's `owns` line touched in stage 3, only on the lines named above: src/fx/Camera.tsx, src/fx/Callout.tsx, src/config/camera.ts.
+- Before and after stills at f2920, f3230 and f3500 (0.5 scale, out/s3-before and out/s3-after, gitignored): the callout chips ("Parallax from Earth's orbit", "Nearby: asteroid or comet", "Cross-matched to known") read the same on the starfield and on the panel.
+- `node tools/audit-motion.mjs` after the fix: 10 scenes, 0 failures, 0 warnings, longest camera hold 30 frames.
+- Step 5, honesty list, looked at on stills rendered from the final code (out/s3-honesty): S5 f2560 shows 148/150 and f2600 shows 148/150 next to 107/150 with the explanation line; S6 f3230 shows the "Nearby object: asteroid or comet" verdict with its callout and f3340 shows the caption "A distant fit is a candidate. Never a detection."; S7 f3500 and f3700 show the "saved in this browser only" pill and the status line "Saved in this browser (no shared store is configured)."; S8 f3850 shows the REAL, SIMULATED and LIMITED columns with the "Prototype, not a discovery tool" footer text in the app layer, f4000 shows the "Simulated · practice field" pill, 148 of 150 and 107 of 150, and f4140 shows the prototype badge under the caption "Nothing here claims a detection." The strings exist in src/config/copy.ts (`badges.simulated`, `badges.prototype`), src/ui/PanelFlags.tsx and src/gfx/LimitsCard.tsx. No fix was needed.
+- Deferred Requests, decisions:
+  - [11] reference-layers selector in src/data/select.ts: NOT applied, left as a note. No scene reads it (PanelContext keeps its own three-entry copy) and select.ts is a typed contract over the captured evidence; adding an unused selector changes nothing on screen.
+  - [12] orbit polyline and measured and predicted angles in `parallax.measuredPair.fit`: NOT applied, left as a note. It needs the evidence regenerated from real data (scripts/capture-evidence.mjs), and S6 already draws the six-month shift as a scale bracket. The "25-25 AU" range is the `rangeAu` of the measured pair, which is a near fit (`dminAu` 25); the range is printed only for the distant verdict, and the film shows the near verdict, so it never appears on screen.
+  - [17] `knownReveal` viewer field and a Known objects tick-box focus rect: NOT applied, left as a note for the final handoff. The viewer slice of filmState is a frozen contract.
+  - [16, 18, 19] optional "for patch 23 to judge" items: left unchanged. No defect from them showed in the stills reviewed in stages 2 and 3; the stage 4 contact sheets for S3, S5 and S6 are where one would show.
+
+Stage 4 - what to do next (spec step 6):
+- `npx remotion render SpherexFilm out/preview.mp4 --scale=0.25`, preview only, not full quality.
+- `node scripts/make-sheets.mjs` and look at the contact sheet of each scene, including S3 (Overlay click, badge position, jump callout anchors), S5 (crosses over the no-data hatch) and S6.
+- `node tools/ledger.mjs done 23`, then update this block, HANDOFF.md (and `cp HANDOFF.md docs/HANDOFF.md`) and docs/patches/status.json to DONE, and build the final patch.
 - Environment is not persistent. In a fresh container run `npm install` (not `npm ci`: the lock file is out of sync with package.json, restore it with `git checkout package-lock.json` afterwards), `git clone --depth 1 https://github.com/Unavailable4u/spherex-blink.git <dir>`, then `node scripts/fetch-assets.mjs --from <dir>` and `npm run sfx`. Chromium for stills is at /opt/pw-browsers/chromium-1243/chrome-linux64/chrome; `node tools/shots.mjs SpherexFilm <frames> <outdir> 0.5 <chrome>` renders named stills and `node scripts/check-stills.mjs --frames <list> --scale 0.5 --browser <chrome>` runs the pass checks.

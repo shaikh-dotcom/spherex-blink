@@ -69,10 +69,10 @@
     "at": "2026-11-08"
   },
   "23": {
-    "state": "in-progress",
+    "state": "done",
     "owner": "",
-    "note": "stages 1 to 3 of 4 done, next stage 4 (preview render, contact sheets, done)",
-    "at": "2026-11-11"
+    "note": "Continuity and motion pass, all four stages",
+    "at": "2026-11-10"
   },
   "00": {
     "state": "done",

@@ -47,14 +47,16 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-10. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **88%** by effort weight (153 of 173 units; 8 more in progress)
-- Patches: 23 done, 1 in progress, 0 blocked, 2 not started (of 26)
+- Work done: **93%** by effort weight (161 of 173 units; 0 more in progress)
+- Patches: 24 done, 0 in progress, 0 blocked, 2 not started (of 26)
 - Film scenes finished: 4500 of 4500 frames (100%)
-- Work left: 20 effort units. Longest remaining chain: 23 -> 24 -> 25
+- Work left: 12 effort units. Longest remaining chain: 24 -> 25
 
 ### Ready now (all needs done, nobody started)
 
-Nothing is ready. Check in-progress and blocked rows below.
+These can all run at the same time in separate sessions: they need only finished patches and they own different files.
+
+- **24** Audio sync and mix (weight 6; owns docs/bible/bible-09.md)
 
 ### Every patch
 
@@ -83,7 +85,7 @@ Nothing is ready. Check in-progress and blocked rows below.
 | 20 | 3 | done | 8 | 09, 10 | Scene S7 Flag | Scene S7 Flag |
 | 21 | 2 | done | 6 | 03 | Scene S8 Limits | S8 Limits scene |
 | 22 | 2 | done | 3 | 02 | Scene S9 Outro | S9 Outro scene |
-| 23 | 4 | in-progress | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | stages 1 to 3 of 4 done, next stage 4 (preview render, contact sheets, done) |
+| 23 | 4 | done | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | Continuity and motion pass, all four stages |
 | 24 | 5 | todo | 6 | 04, 23 | Audio sync and mix | - |
 | 25 | 6 | todo | 6 | 05, 06, 24 | Final QA, renders and submission assets | - |
 
@@ -436,7 +438,7 @@ Append one block per finished patch: files, public API, FINAL slice fields, cue 
 - Deviations: (1) the diagram ends at f2818, not f2860: it is a stage overlay that cannot follow the camera, and past f2820 it sat over the live lab text. (2) The viewer zoom and the playhead change on the field swaps at f3000 and f3060, so those two changes hide in the app's own field switch. (3) The six-month shift is shown as a bracket, not a track (see above). (4) The honest beat frames orreryCard at 1.25, not the panel, so the solar-system card sits above the lower-third caption and the Clear button stays in frame for the click. (5) The marks are cleared at f3390, not held to the end, so the exit state matches bible-04.
 - Requests for shared files: none to edit. For patch 23 to judge: (1) S7 starts with tabs.tab "inspect" while S6 ends on "planetx"; S7 has no tab click, so check that cut. (2) If per-button focus rects for Mark A, Mark B, Clear and the distance slider are added to src/config/focus.ts, the cursor constants in this file could come from them (the pxDistance rect, y 150 to 220, sits above the real slider track at y 229). (3) Extending the orrery evidence to cover 2025-04 to 2026-04 would let the viewer draw the real six-month track in place of the bracket.
 
-### PATCH 23 (Continuity and motion pass) - STAGES 1 to 3 of 4 done, patch still in progress
+### PATCH 23 (Continuity and motion pass) - ALL 4 STAGES done, patch finished
 
 Patch 23 is too large for one session, so it runs in four stages. Each stage ends with this block and HANDOFF.md updated. Later stages edit only the "Stage status" list and add their own "Stage N" paragraph; they do not rewrite earlier paragraphs.
 
@@ -444,7 +446,7 @@ Stage status:
 - Stage 1 (spec step 1, plus the step 3 audit and the step 4 check on added lines): DONE.
 - Stage 2 (spec step 2, the nine scene boundaries): DONE (three boundaries fixed, see "Stage 2" below).
 - Stage 3 (spec steps 4 and 5 in full, and the decision on the deferred Requests below): DONE (see "Stage 3" below).
-- Stage 4 (spec step 6, preview render and contact sheets, then `node tools/ledger.mjs done 23`): NOT STARTED.
+- Stage 4 (spec step 6, preview render and contact sheets, then `node tools/ledger.mjs done 23`): DONE (see "Stage 4" below).
 
 Stage 1 - Requests applied (source patch in brackets):
 - [22] Grain and Vignette fade to zero over 4470-4499. src/fx/Grain.tsx exports `GRAIN_OPACITY` (0.03) and src/fx/Vignette.tsx exports `VIGNETTE_STRENGTH` (0.12) as the defaults. src/SpherexFilm.tsx computes `finish = 1 - signature(clamp01((frame - CUES.s9.fade) / (SCENES.S9.end - CUES.s9.fade)))` and passes `GRAIN_OPACITY * finish` and `VIGNETTE_STRENGTH * finish`. New cue `CUES.s9.fade` = 4470 in src/config/timeline.ts (the value S9Outro already used; S9Outro now reads `FADE_START = CUES.s9.fade`). No scene range or cut changed, so bible-03 needs no edit. Measured result: f4470 identical to before, f4499 is exactly the paper colour with min = max on every channel (before: grain still visible).
@@ -494,8 +496,11 @@ Base: the stage 1 and 2 patch had already been committed as f8cfc30 on top of 03
   - [17] `knownReveal` viewer field and a Known objects tick-box focus rect: NOT applied, left as a note for the final handoff. The viewer slice of filmState is a frozen contract.
   - [16, 18, 19] optional "for patch 23 to judge" items: left unchanged. No defect from them showed in the stills reviewed in stages 2 and 3; the stage 4 contact sheets for S3, S5 and S6 are where one would show.
 
-Stage 4 - what to do next (spec step 6):
-- `npx remotion render SpherexFilm out/preview.mp4 --scale=0.25`, preview only, not full quality.
-- `node scripts/make-sheets.mjs` and look at the contact sheet of each scene, including S3 (Overlay click, badge position, jump callout anchors), S5 (crosses over the no-data hatch) and S6.
-- `node tools/ledger.mjs done 23`, then update this block, HANDOFF.md (and `cp HANDOFF.md docs/HANDOFF.md`) and docs/patches/status.json to DONE, and build the final patch.
+Stage 4 - preview render and contact sheets (spec step 6): DONE.
+- Render: `npx remotion render src/index.ts SpherexFilm out/preview.mp4 --scale=0.25 --concurrency=2` with the sandbox Chromium. It finished with no warnings or errors in the log. ffprobe: h264 video 480x270, 4500 frames, 150.0 s, and an aac audio track of the same length (the audio files were built first with `npm run sfx`). out/ is gitignored, so the video is not in the patch.
+- Contact sheets: `node scripts/make-sheets.mjs --scene S0` to `--scene S9`, every 15 frames, 6 columns, scale 0.25, written to out/sheets/ (gitignored). All ten sheets were looked at, sampled every 15 frames at that size, so they show scene flow, captions, framing and the scene joins, not fine detail.
+- What the sheets show: S0 and S1 open on the star field and title, with the cue captions where the timeline puts them; S2 the counters, the colour-band card and the day-by-day field swap; S3 the Pluto-trick caption, blink and overlay, and the best-pair caption; S4 the hunt, the selected point and the mover check; S5 the check against the sky, 148/150 and then 107/150 under "The stricter check is honest too."; S6 the parallax diagram, the lab, the six-month bracket, the near verdict and the closing caption "A distant fit is a candidate. Never a detection."; S7 the flag, the cross-match chip, the export captions and the browser-only wording; S8 the three columns, the hatch, and the prototype badge under "Nothing here claims a detection."; S9 the lockup, links and credit text, fading to the dark ground by f4499. No blank stretch, no frozen scene and no jump at a scene start was seen in any sheet.
+- Not checked by this stage: playback by eye at speed, and the audio mix (patch 24 owns it).
+- Nothing in src changed in stage 4. `node tools/ledger.mjs done 23 "Continuity and motion pass, all four stages"` was run; patch 24 is now ready.
+
 - Environment is not persistent. In a fresh container run `npm install` (not `npm ci`: the lock file is out of sync with package.json, restore it with `git checkout package-lock.json` afterwards), `git clone --depth 1 https://github.com/Unavailable4u/spherex-blink.git <dir>`, then `node scripts/fetch-assets.mjs --from <dir>` and `npm run sfx`. Chromium for stills is at /opt/pw-browsers/chromium-1243/chrome-linux64/chrome; `node tools/shots.mjs SpherexFilm <frames> <outdir> 0.5 <chrome>` renders named stills and `node scripts/check-stills.mjs --frames <list> --scale 0.5 --browser <chrome>` runs the pass checks.

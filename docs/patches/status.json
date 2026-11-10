@@ -74,6 +74,11 @@
     "note": "Continuity and motion pass, all four stages",
     "at": "2026-11-10"
   },
+  "24": {
+    "state": "done",
+    "note": "Audio sync and mix: SFX_CUES rebuilt from the finished scenes (70 hits and 36 pulses), drone fade ends at f4480, cue table in bible-09",
+    "at": "2026-11-10"
+  },
   "00": {
     "state": "done",
     "owner": "",

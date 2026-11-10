@@ -4,7 +4,7 @@ Deterministic Remotion motion video (1920x1080, 30 fps, 4500 frames = 150 s) for
 
 Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status and the handoff entries of finished patches), docs/bible/bible-04.md (frozen contract), then your patch in docs/patches/patch-NN.md. `node tools/make-prompt.mjs NN` builds a ready prompt in prompts-out/.
 
-## 1. Status: 23 of 26 patches done (about 88 percent of the effort, 4500 of 4500 scene frames)
+## 1. Status: 24 of 26 patches done (about 97 percent of the effort, 4500 of 4500 scene frames)
 
 | Patch | What | State |
 |---|---|---|
@@ -29,12 +29,12 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 18 | Scene S5 Check | DONE (tsc clean; motion audit passes; stills at the cue frames checked; 148 of 150 and 107 of 150 both on screen in a card shot; predicted-position crosses drawn by the scene overlay; reference blend 0 to 0.6 to 0 on the slider; Request for patch 19 in the ledger: S6 must open from fullWindow scale 1.19) |
 | 19 | Scene S6 Planet X | DONE (tsc clean; motion audit passes on all 10 scenes; stills at the cue frames checked; Earth-orbit diagram ends at f2818 so it never sits over the lab text; six-month shift drawn as a 127 px scale bracket by the scene overlay because the orbit evidence has no Earth position for 2025-04 to 2026-04; near verdict on screen about 210 frames; honest beat framed on orreryCard 1.25; Requests for patch 23 in the ledger: S6 to S7 tab cut, per-button focus rects, orrery evidence range) |
 | 23 | Continuity and motion pass | DONE (all four stages: tsc clean; motion audit 10 of 10 scenes pass; nine scene boundaries continuous; repo-wide hygiene greps clean; honesty list checked on stills; 0.25-scale preview render of 4500 frames with audio; contact sheet of every scene reviewed; see "Patch 23 stages" below and the PATCH 23 block in the ledger) |
-| 24 | Audio sync and mix | TODO, can start now (04 and 23 done) |
+| 24 | Audio sync and mix | DONE (tsc clean; motion audit 10 of 10 scenes pass; sfx:check passes; SFX_CUES rebuilt from CUES and the cursor waypoints: 70 hits and 36 pulses, table in docs/bible/bible-09.md; drone fades out by f4480 and the last 20 frames render as digital silence; offline mix -28.1 LUFS, true peak -6.0 dBFS, every hit at least 10 dB over the drone; not listened to by ear; see the PATCH 24 block in the ledger) |
 | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
 
-Remaining: 12 of 173 effort units. Longest remaining chain: 23 -> 24 -> 25.
+Remaining: 6 of 173 effort units. Only patch 25 is left.
 
-Ready now: 24. Patch 25 waits for 24. Run `node tools/ledger.mjs next` for the live list.
+Ready now: 25. Run `node tools/ledger.mjs next` for the live list.
 
 ### Patch 23 stages
 
@@ -95,9 +95,10 @@ In a sandbox without internet, Remotion cannot download its own Chrome: pass `--
 3. LimitsCard has no Ceres row on purpose (the app does not explain Ceres). Patch 21 did not add one.
 4. Check the Space Apps submission page for any video length limit; none was found in the judging guide.
 5. Patch 06 was audited on S0, S1, S8, S9 and on synthetic camera tracks; S2 to S7 pass too, so the full audit is clean for the first time. Re-run `npm run motion` after every change in patch 23.
+6. Audio (patch 24): the cue list in src/config/sfx.ts reads click frames from FILM_CURSOR and callout and caption frames from CUES. If a scene moves a callout or caption off its CUES frame, move the same cue in sfx.ts; the module throws on load if two hits come within 3 frames or a sound reaches the last 20 frames. The mix measures -28.1 LUFS integrated and -6.0 dBFS true peak (bible-09 aims at about -20 LUFS) and has not been listened to.
 
 ## 6. Next steps for whoever continues
 
 1. `npm install`, `npm run assets -- --from ../spherex-blink`, `npm run sfx`.
 2. Run the continuity and motion pass (23, on the critical path): `node tools/ledger.mjs start 23`, build the prompt with `node tools/make-prompt.mjs 23`, work through the Requests for shared files in the ledger entries (S6 ends on tabs.tab "planetx" and S7 starts on "inspect" with no tab click; per-button focus rects; the S5 and S8 requests), run the patch's CHECK, `node tools/ledger.mjs done 23 "note"`, add a ledger block.
-3. Then 24, 25.
+3. Patch 24 (audio sync and mix) is done. Next is patch 25 (final QA, renders, submission files): `node tools/ledger.mjs start 25`, then `node tools/make-prompt.mjs 25`. Listen to the mix in the studio first (patch 24 could not) and decide whether to raise the loudness, see the PATCH 24 block in the ledger.

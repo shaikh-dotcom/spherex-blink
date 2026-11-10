@@ -47,16 +47,16 @@ Updated by `node tools/ledger.mjs sync` on 2026-11-10. Do not edit by hand; run 
 
 ### Progress
 
-- Work done: **93%** by effort weight (161 of 173 units; 0 more in progress)
-- Patches: 24 done, 0 in progress, 0 blocked, 2 not started (of 26)
+- Work done: **97%** by effort weight (167 of 173 units; 0 more in progress)
+- Patches: 25 done, 0 in progress, 0 blocked, 1 not started (of 26)
 - Film scenes finished: 4500 of 4500 frames (100%)
-- Work left: 12 effort units. Longest remaining chain: 24 -> 25
+- Work left: 6 effort units. Longest remaining chain: 25
 
 ### Ready now (all needs done, nobody started)
 
 These can all run at the same time in separate sessions: they need only finished patches and they own different files.
 
-- **24** Audio sync and mix (weight 6; owns docs/bible/bible-09.md)
+- **25** Final QA, renders and submission assets (weight 6; owns docs/submission/*, out/*)
 
 ### Every patch
 
@@ -86,7 +86,7 @@ These can all run at the same time in separate sessions: they need only finished
 | 21 | 2 | done | 6 | 03 | Scene S8 Limits | S8 Limits scene |
 | 22 | 2 | done | 3 | 02 | Scene S9 Outro | S9 Outro scene |
 | 23 | 4 | done | 8 | 06, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | Continuity and motion pass (scenes joined, audit clean) | Continuity and motion pass, all four stages |
-| 24 | 5 | todo | 6 | 04, 23 | Audio sync and mix | - |
+| 24 | 5 | done | 6 | 04, 23 | Audio sync and mix | Audio sync and mix: SFX_CUES rebuilt from the finished scenes (70 hits and 36 pulses), drone fade ends at f4480, cue table in bible-09 |
 | 25 | 6 | todo | 6 | 05, 06, 24 | Final QA, renders and submission assets | - |
 
 ### Waves: what runs in parallel and what runs in order
@@ -504,3 +504,15 @@ Stage 4 - preview render and contact sheets (spec step 6): DONE.
 - Nothing in src changed in stage 4. `node tools/ledger.mjs done 23 "Continuity and motion pass, all four stages"` was run; patch 24 is now ready.
 
 - Environment is not persistent. In a fresh container run `npm install` (not `npm ci`: the lock file is out of sync with package.json, restore it with `git checkout package-lock.json` afterwards), `git clone --depth 1 https://github.com/Unavailable4u/spherex-blink.git <dir>`, then `node scripts/fetch-assets.mjs --from <dir>` and `npm run sfx`. Chromium for stills is at /opt/pw-browsers/chromium-1243/chrome-linux64/chrome; `node tools/shots.mjs SpherexFilm <frames> <outdir> 0.5 <chrome>` renders named stills and `node scripts/check-stills.mjs --frames <list> --scale 0.5 --browser <chrome>` runs the pass checks.
+
+### PATCH 24 (Audio sync and mix) - done
+
+- Files: src/config/sfx.ts, src/audio/FilmAudio.tsx, docs/bible/bible-09.md. scripts/make-sfx.mjs and src/config/timeline.ts are unchanged: the nine WAV files are the same as before.
+- SFX_CUES is now 106 cues (70 hits and 36 pulses) built from CUES and the cursor waypoints: 9 whooshes at the scene starts; 3 risers at f240, f2640 and f4140; 1 thud at f735 (both S2 stat numerals lock at 690 + 45); 1 hatch at f3810; 15 blink ticks f1140 to f1280 every 10 frames at gain 0.25; 15 clicks, one per click waypoint in FILM_CURSOR; 14 chimes, one per Callout (6 verdict callouts at 0.5, the other 8 at 0.32); 12 caption ticks at 0.22; the pulses as before. The full table is in docs/bible/bible-09.md.
+- Changes from the spec: (1) caption ticks are 0.22, not very soft: at 0.1 they were only 3.5 dB over the drone at f3540, and 0.22 gives 10.3 dB at the worst frame, which the 10 dB rule needs. (2) 7 caption ticks are left out because a whoosh or a blink tick already marks the frame (f600, 1230, 1680, 2220, 2700, 3420, 3780). (3) The chimes for s3.calloutStars and s3.calloutJump move 3 frames later to clear the blink ticks on f1170 and f1200. (4) Drone gain stays 0.35 (set in patch 04). The fade-out is applied in FilmAudio through `droneGainAt` (smoothstep over 3 s, zero at f4480) so that the last 20 frames are silent; the WAV's own 3 s fade ends on the last frame and would have left sound there. The WAV is not changed.
+- src/config/sfx.ts now imports FILM_CURSOR from ../scenes so that every click sound sits on the real click frame. It throws on load if two hits (the pulse excluded) are closer than 3 frames or if any cue sounds into the last 20 frames. Callout and caption frames come from CUES, not from the scenes; they match today (every Callout and Caption `startFrame` in the ten scenes was evaluated and compared). A scene that moves one of them off its CUES value needs the same edit in sfx.ts.
+- Checked: `npx tsc --noEmit` clean; `node tools/ledger.mjs check` clean; `node scripts/make-sfx.mjs --check` passes; `node tools/audit-motion.mjs` 10 scenes, 0 failures, 0 warnings; added lines grepped clean (comments, TODO, timers, requestAnimationFrame, Date.now, Math.random, backdrop-filter, transition); `git diff --check` clean.
+- Mix measured on an offline sum of the drone and every cue at these gains (throwaway script, not committed): true peak -6.0 dBFS, integrated -28.1 LUFS, loudness range 12.4 LU. Every hit is at least 10 dB above the drone's RMS in a 0.4 s window around it; lowest margins: caption tick 10.3 dB (f3540), note chime 14.3 dB (f3000), click 17.2 dB (f3114), blink tick 17.7 dB (f1220).
+- Rendered with scripts/render.mjs: f1136-1195 (60 frames, h264 and aac, audio 2.005 s). Its audio matches the offline mix at lag 0 with correlation 1.000, and the click at f1136, the ticks at f1140 to f1190 and the chime at f1173 are where the cue list puts them. f4380-4499: the drone fades out and f4480-4499 are digital silence.
+- Not checked: listening in the studio or on speakers (no audio output in the sandbox), so the balance is measured, not heard. The integrated loudness is about 8 LU under the bible-09 target of about -20 LUFS; raising it needs a drone gain above 0.35 or louder hits. Left for patch 25 to decide after listening.
+- Requests: none.

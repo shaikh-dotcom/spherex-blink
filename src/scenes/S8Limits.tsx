@@ -2,7 +2,6 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import type { FilmStatePatch } from "../config/filmState";
 import { holdShot, type CameraKeyframe, type CursorWaypoint } from "../config/camera";
-import { focusRect, rectCenter } from "../config/focus";
 import { badges, s8 } from "../config/copy";
 import { CUES, SCENES, STAGE } from "../config/timeline";
 import { fonts, theme } from "../config/theme";
@@ -11,6 +10,7 @@ import { Badge, badgeReveal } from "../fx/Badge";
 import { inOut } from "../fx/util";
 import { LimitsCard } from "../gfx/LimitsCard";
 import { clamp01, signature } from "../lib/ease";
+import { S7_STATE } from "./S7Flag";
 
 const START = SCENES.S8.start;
 const END = SCENES.S8.end;
@@ -47,12 +47,12 @@ function cardProgress(frame: number): number {
 
 export const S8_CAMERA: CameraKeyframe[] = holdShot(START, END, "fullWindow", { arrive: 24, push: 0.03 });
 
-export const S8_CURSOR: CursorWaypoint[] = [{ frame: START, ...rectCenter(focusRect("fullWindow")), hide: true }];
+export const S8_CURSOR: CursorWaypoint[] = [];
 
 export const S8_STATE = (frame: number): FilmStatePatch => {
   const dim = signature(clamp01((frame - START) / 30));
   const lift = signature(clamp01((frame - LIFT_START) / (END - LIFT_START)));
-  return { appOpacity: (1 - 0.85 * dim) * (1 - lift) };
+  return { ...S7_STATE(SCENES.S7.end), appOpacity: (1 - 0.85 * dim) * (1 - lift) };
 };
 
 const HatchPair: React.FC<{ frame: number }> = ({ frame }) => {

@@ -41,7 +41,18 @@ export const FilmApp: React.FC = () => {
       <Rail state={s.rail} />
       <SkyViewer state={s.viewer} />
       <TimeBar state={s.time} />
-      <div style={{ position: "absolute", left: panel.x, top: panel.y, width: panel.w, height: panel.h }} />
+      <div
+        style={{
+          position: "absolute",
+          left: panel.x,
+          top: panel.y,
+          width: panel.w,
+          height: panel.h,
+          boxSizing: "border-box",
+          borderLeft: `1px solid ${theme.rule2}`,
+          background: theme.panelGradient,
+        }}
+      />
       <PanelTabs state={s.tabs} />
       {s.tabs.tab === "inspect" && (
         <>

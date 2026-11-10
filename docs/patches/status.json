@@ -68,6 +68,12 @@
     "note": "S9 Outro scene",
     "at": "2026-11-08"
   },
+  "23": {
+    "state": "in-progress",
+    "owner": "",
+    "note": "stages 1 and 2 of 4 done, next stage 3 (hygiene, honesty check, deferred Requests)",
+    "at": "2026-11-10"
+  },
   "00": {
     "state": "done",
     "owner": "",

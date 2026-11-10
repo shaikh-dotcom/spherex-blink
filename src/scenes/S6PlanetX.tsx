@@ -14,6 +14,7 @@ import { getCameraState, worldToStage } from "../fx/Camera";
 import { clamp01, signature } from "../lib/ease";
 import { ParallaxDiagram } from "../gfx/ParallaxDiagram";
 import { tileToApp } from "../ui/viewer/geometry";
+import { S5_STATE } from "./S5Check";
 
 const START = SCENES.S6.start;
 const END = SCENES.S6.end;
@@ -36,6 +37,8 @@ const DIM_UP_AT = 2800;
 const DIM_UP_FRAMES = 24;
 
 const TAB_FRAMES = 20;
+const SWAP_AT = START + 20;
+const INSPECT_TAB_CLICK_AT = SCENES.S7.start - 4;
 const LAB_AT = 2820;
 const SLIDER_CLICK_AT = LAB_AT - CLICK_LEAD;
 const SLIDER_FRAMES = 45;
@@ -142,6 +145,8 @@ const SLIDER = { x0: 1235, x1: 1575, y: 229 } as const;
 const MARK_A_BTN = { x: 1289, y: 464.5 } as const;
 const MARK_B_BTN = { x: 1405, y: 464.5 } as const;
 const CLEAR_BTN = { x: 1521, y: 464.5 } as const;
+const tabsRect = focusRect("tabs");
+const INSPECT_TAB = { x: tabsRect.x + tabsRect.w / 6, y: tabsRect.y + tabsRect.h / 2 } as const;
 const FIT_TARGET = { x: 1240, y: 575 } as const;
 
 function bias(name: FocusName, scale: number): number {
@@ -194,7 +199,7 @@ export const S6_CURSOR: CursorWaypoint[] = [
   { frame: 3148, x: MARK_B_BTN.x + 14, y: MARK_B_BTN.y + 18, hide: true },
   { frame: CLEAR_CLICK_AT - 12, x: CLEAR_BTN.x - 60, y: CLEAR_BTN.y + 90 },
   { frame: CLEAR_CLICK_AT, x: CLEAR_BTN.x, y: CLEAR_BTN.y, click: true },
-  { frame: CLEAR_AT + 10, x: CLEAR_BTN.x + 16, y: CLEAR_BTN.y + 26, hide: true },
+  { frame: INSPECT_TAB_CLICK_AT, x: INSPECT_TAB.x, y: INSPECT_TAB.y, click: true },
 ];
 
 const pulseAt = (frame: number, start: number): number => {
@@ -247,6 +252,7 @@ export const S6_STATE = (frame: number): FilmStatePatch => {
   const sweeping = six && frame >= SIX_SWEEP_AT && frame < MEASURE_AT - 2;
   const epochSeg = sweeping ? (position < 1 / 3 ? 1 : position < 2 / 3 ? 2 : 3) : null;
   const dim = 1 - (1 - DIM_FLOOR) * (ramp(frame, START, DIAGRAM_IN_FRAMES) - ramp(frame, DIM_UP_AT, DIM_UP_FRAMES));
+  if (frame < SWAP_AT) return { ...S5_STATE(SCENES.S5.end), appOpacity: dim };
   const selection =
     frame >= SELECT_A_AT && frame < MARK_A_AT + 6
       ? { col: TARGET_A.col, row: TARGET_A.row }
@@ -279,7 +285,7 @@ export const S6_STATE = (frame: number): FilmStatePatch => {
     tabs: { tab: "planetx", reveal: 1 },
     planetx: {
       distanceAu: sliderDistance(frame),
-      reveal: ramp(frame, START, TAB_FRAMES),
+      reveal: ramp(frame, SWAP_AT, TAB_FRAMES),
       outReveal: ramp(frame, LAB_AT, OUT_FRAMES),
       sixReveal: ramp(frame, SIX_AT, SIX_FRAMES),
       measureReveal: measuring ? ramp(frame, MEASURE_AT, MEASURE_FRAMES) : 0,

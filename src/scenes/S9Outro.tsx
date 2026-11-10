@@ -12,7 +12,7 @@ import { clamp01, signature } from "../lib/ease";
 const START = SCENES.S9.start;
 const END = SCENES.S9.end;
 const MARK_DRAW_END = 4290;
-const FADE_START = 4470;
+const FADE_START = CUES.s9.fade;
 const TAGLINE_AT = CUES.s9.lockup + 15;
 const REPO_AT = CUES.s9.link + 15;
 const TAIL_AT = CUES.s9.link + 30;

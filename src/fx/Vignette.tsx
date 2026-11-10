@@ -4,7 +4,8 @@ import { shade } from "../config/theme";
 export interface VignetteProps {
     strength?: number;
 }
-export const Vignette: React.FC<VignetteProps> = ({ strength = 0.12 }) => (<div style={{
+export const VIGNETTE_STRENGTH = 0.12;
+export const Vignette: React.FC<VignetteProps> = ({ strength = VIGNETTE_STRENGTH }) => (<div style={{
         position: "absolute",
         left: 0,
         top: 0,

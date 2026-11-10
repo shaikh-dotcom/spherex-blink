@@ -9,7 +9,8 @@ export interface GrainProps {
 export function grainSeed(frame: number): number {
     return Math.floor(rand(frame * 31 + 11) * 100000);
 }
-export const Grain: React.FC<GrainProps> = ({ opacity = 0.03, frequency = 0.85 }) => {
+export const GRAIN_OPACITY = 0.03;
+export const Grain: React.FC<GrainProps> = ({ opacity = GRAIN_OPACITY, frequency = 0.85 }) => {
     const frame = useCurrentFrame();
     const id = useId().replace(/:/g, "");
     return (<svg width={STAGE.w} height={STAGE.h} style={{ position: "absolute", left: 0, top: 0, pointerEvents: "none", opacity, mixBlendMode: "overlay" }}>

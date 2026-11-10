@@ -2,12 +2,13 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import "./ui/theme.css";
 import { theme } from "./config/theme";
-import { STAGE } from "./config/timeline";
+import { CUES, SCENES, STAGE } from "./config/timeline";
 import { FontsReady } from "./lib/fonts";
+import { clamp01, signature } from "./lib/ease";
 import { Camera, getCameraState } from "./fx/Camera";
 import { Cursor } from "./fx/Cursor";
-import { Grain } from "./fx/Grain";
-import { Vignette } from "./fx/Vignette";
+import { Grain, GRAIN_OPACITY } from "./fx/Grain";
+import { Vignette, VIGNETTE_STRENGTH } from "./fx/Vignette";
 import { FilmApp } from "./ui/FilmApp";
 import { FILM_CAMERA, FILM_CURSOR, SCENE_OVERLAYS } from "./scenes";
 import { FilmAudio } from "./audio/FilmAudio";
@@ -40,6 +41,7 @@ export const SpherexFilm: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const zoom = getCameraState(frame, FILM_CAMERA, fps).scale;
+  const finish = 1 - signature(clamp01((frame - CUES.s9.fade) / (SCENES.S9.end - CUES.s9.fade)));
   return (
     <FontsReady>
       <Stage>
@@ -52,8 +54,8 @@ export const SpherexFilm: React.FC = () => {
         {SCENE_OVERLAYS.map(({ id, Overlay }) => (
           <Overlay key={id} />
         ))}
-        <Vignette />
-        <Grain />
+        <Vignette strength={VIGNETTE_STRENGTH * finish} />
+        <Grain opacity={GRAIN_OPACITY * finish} />
         <FilmAudio />
       </Stage>
     </FontsReady>

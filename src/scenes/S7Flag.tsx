@@ -10,12 +10,12 @@ import { Callout } from "../fx/Callout";
 import { Caption } from "../fx/Caption";
 import { clamp01, signature } from "../lib/ease";
 import { INSPECT_SPLIT } from "../ui/PanelInspect";
-import { tileToApp } from "../ui/viewer/geometry";
 
 const START = SCENES.S7.start;
 const END = SCENES.S7.end;
 
 const CLICK_LEAD = 4;
+const TAB_FRAMES = 20;
 const FORM_AT = 3450;
 const FORM_FRAMES = 30;
 const FLAG_AT = 3478;
@@ -69,12 +69,10 @@ export const S7_CAMERA: CameraKeyframe[] = [
 ];
 
 const panel = focusRect("panel");
-const pickAt = tileToApp(OVERVIEW, SELECTION.col, SELECTION.row);
 const FLAG_IT = { x: panel.x + panel.w / 2, y: INSPECT_SPLIT + FLAG_IT_DY } as const;
 const MATCH_TARGET = { x: panel.x + 26, y: INSPECT_SPLIT + MATCH_DY } as const;
 
 export const S7_CURSOR: CursorWaypoint[] = [
-  { frame: 3438, x: pickAt.x + 90, y: pickAt.y + 60 },
   { frame: CLICK_AT, x: FLAG_IT.x, y: FLAG_IT.y, click: true },
   { frame: 3500, x: ASIDE.x, y: ASIDE.y },
   { frame: 3516, x: ASIDE.x - 12, y: ASIDE.y - 10, hide: true },
@@ -117,7 +115,7 @@ export const S7_STATE = (frame: number): FilmStatePatch => {
     },
     time: { fieldId: "pallas", position: 0, epochSeg: null, reveal: 1 },
     tabs: { tab: "inspect", reveal: 1 },
-    inspect: { reveal: 1, verdict: "moves", verdictReveal: 1 },
+    inspect: { reveal: signature(clamp01((frame - START) / TAB_FRAMES)), verdict: "moves", verdictReveal: signature(clamp01((frame - START) / TAB_FRAMES)) },
     flags: {
       formReveal: signature(clamp01((frame - FORM_AT) / FORM_FRAMES)),
       category: CATEGORY,

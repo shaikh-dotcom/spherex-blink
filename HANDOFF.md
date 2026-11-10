@@ -28,13 +28,32 @@ Read in this order: docs/guide/context-header.md, docs/LEDGER.md (live status an
 | 20 | Scene S7 Flag | DONE (tsc clean; motion audit passes; stills at the cue frames checked; click at f3474 with flag at f3478; last shot stays on flagList so the caption sits on clear ground; Requests for patch 23 in the ledger: flag rects and the S8 cursor hide waypoint) |
 | 18 | Scene S5 Check | DONE (tsc clean; motion audit passes; stills at the cue frames checked; 148 of 150 and 107 of 150 both on screen in a card shot; predicted-position crosses drawn by the scene overlay; reference blend 0 to 0.6 to 0 on the slider; Request for patch 19 in the ledger: S6 must open from fullWindow scale 1.19) |
 | 19 | Scene S6 Planet X | DONE (tsc clean; motion audit passes on all 10 scenes; stills at the cue frames checked; Earth-orbit diagram ends at f2818 so it never sits over the lab text; six-month shift drawn as a 127 px scale bracket by the scene overlay because the orbit evidence has no Earth position for 2025-04 to 2026-04; near verdict on screen about 210 frames; honest beat framed on orreryCard 1.25; Requests for patch 23 in the ledger: S6 to S7 tab cut, per-button focus rects, orrery evidence range) |
-| 23 | Continuity and motion pass | TODO, can start now (all scenes and 06 done) |
+| 23 | Continuity and motion pass | IN PROGRESS, stages 1 and 2 of 4 done (see "Patch 23 stages" below and the PATCH 23 block in the ledger) |
 | 24 | Audio sync and mix | TODO after 04 (done) and 23 |
 | 25 | Final QA, renders, submission files | TODO after 05, 06, 24 |
 
 Remaining: 20 of 173 effort units. Longest remaining chain: 23 -> 24 -> 25.
 
-Ready now (separate session or model): 23. Run `node tools/ledger.mjs next` for the live list.
+Ready now: nothing new. Patch 23 is in progress and runs in four stages, one per session; continue it at stage 3. Patches 24 and 25 wait for it.
+
+### Patch 23 stages
+
+Patch 23 is split because one session cannot do all of it. After each stage, add the result to the PATCH 23 block in docs/LEDGER.md, update this section, and produce a patch file (`git diff` of tracked files only; `public/` holds fetched assets and generated manifests and stays out).
+
+| Stage | Spec steps | State |
+|---|---|---|
+| 1 | Step 1 (apply the Requests that touch focus rects, theme, FilmApp, Grain, Vignette, CUES, the S8 cursor), step 3 audit, step 4 on the added lines | DONE: tsc clean, ledger check clean, motion audit 10 of 10 scenes pass, stills compared before and after |
+| 2 | Step 2: render the last frame of each scene and the first of the next at the nine boundaries and fix any jump in app state, camera pose or cursor | DONE: camera and cursor continuous at all nine; S5 to S6, S6 to S7 and S7 to S8 fixed; check-stills passes on all 18 boundary frames; audit still 0 failures |
+| 3 | Steps 4 and 5 in full: grep the whole repo for comments, timers, transitions, Date.now, backdrop-filter, Math.random; verify the honesty list (S6 near verdict, S5 148/150 and 107/150, S7 browser-only wording, S8 simulated label, prototype text); decide the deferred Requests | TODO |
+| 4 | Step 6: preview render at 0.25 scale to out/preview.mp4, contact sheets per scene, then `node tools/ledger.mjs done 23` | TODO |
+
+Stage 1 applied: Grain and Vignette fade to zero over 4470-4499 (new `CUES.s9.fade`, last frame is exactly the paper colour); flagForm, flagList, pxLab and pxOutput focus rects corrected; the right panel now has its background and left rule; S8 no longer has a cursor waypoint (it caused a one-off cursor blip at f3773-3787).
+
+Stage 2 applied (entry and exit lines of S6, S7, S8 only; camera keyframes untouched): S6 now holds the S5 exit state (Context pane, crosshair, fading cursor) until f2720 and switches to Planet X once the diagram has dimmed the app; S6 ends with a cursor click on the Inspect tab at f3416 and S7 reveals the Inspect pane over 20 frames from f3420 (the S7 cursor fade-in at f3438 is gone, the cursor goes from the tab to Flag it); S8 opens from the S7 exit state instead of the app defaults, so the flag panel no longer blanks at f3780. Residual: the selection crosshair on Pallas appears on f3420 together with the pane change.
+
+Left for later stages: stage 3 is the repo-wide hygiene greps, the honesty check on real frames (S6 near verdict, S5 148/150 and 107/150, S7 browser-only wording, S8 simulated label, prototype text) and the decision on the deferred Requests (reference-layers selector, orbit polyline and angles in the evidence, a viewer `knownReveal` field, optional scene notes; listed in the ledger block with the reasons). Stage 4 is the 0.25-scale preview render, the contact sheets and `node tools/ledger.mjs done 23`.
+
+Environment for the next stage (nothing persists between sessions; `node scripts/check-stills.mjs --frames <list> --scale 0.5 --browser <chrome>` runs the pass checks): `npm install` and then `git checkout package-lock.json` (`npm ci` fails on this lock file); clone https://github.com/Unavailable4u/spherex-blink.git anywhere and run `node scripts/fetch-assets.mjs --from <that clone>` and `npm run sfx`; stills: `node tools/shots.mjs SpherexFilm <frames> <outdir> 0.5 <chrome>` with Chromium at /opt/pw-browsers/chromium-1243/chrome-linux64/chrome.
 
 ## 2. What exists
 

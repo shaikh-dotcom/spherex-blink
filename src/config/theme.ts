@@ -76,6 +76,8 @@ const colors = {
   scrimRgb: "3,4,8",
   veilRgb: "0,0,0",
   glowRgb: "242,162,68",
+  panelTopRgb: "11,13,20",
+  panelBottomRgb: "6,7,11",
 } as const;
 
 const okGradient = `linear-gradient(135deg, ${colors.okA}, ${colors.okB} 55%, ${colors.okC})`;
@@ -93,6 +95,8 @@ const appBackground =
   `radial-gradient(900px 560px at 14% -10%, ${colors.glowA}, transparent 62%), ` +
   `radial-gradient(1000px 720px at 92% 112%, ${colors.glowB}, transparent 62%)`;
 
+const panelGradient = `linear-gradient(180deg, rgba(${colors.panelTopRgb},0.9), rgba(${colors.panelBottomRgb},0.96))`;
+
 export const theme = {
   ...colors,
   okGradient,
@@ -100,6 +104,7 @@ export const theme = {
   hatchNoData,
   stageGradient,
   appBackground,
+  panelGradient,
   appBackgroundSize: "auto, auto",
   gridSize: 44,
   panelShadow: "0 1px 0 rgba(236,230,213,.04) inset, 0 20px 40px -28px rgba(0,0,0,.9)",

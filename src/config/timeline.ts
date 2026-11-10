@@ -63,5 +63,5 @@ export const CUES = {
   s6: { caption: 2700, calloutShift: 2880, calloutSix: 3000, captionMeasure: 3060, calloutNear: 3200, captionHonest: 3300 },
   s7: { caption: 3420, calloutCross: 3480, captionExport: 3540, captionState: 3660 },
   s8: { caption: 3780, columns: 3810, captionHatch: 3900, captionClaim: 4080 },
-  s9: { lockup: 4260, link: 4290, ack: 4350 },
+  s9: { lockup: 4260, link: 4290, ack: 4350, fade: 4470 },
 } as const;

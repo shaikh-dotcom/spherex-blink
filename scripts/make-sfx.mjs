@@ -8,6 +8,7 @@ const RATE = 48000;
 const TAU = Math.PI * 2;
 const args = process.argv.slice(2);
 const check = args.includes("--check");
+const manifestOnly = args.includes("--manifest");
 const onlyIdx = args.indexOf("--only");
 const only = onlyIdx >= 0 ? args[onlyIdx + 1] : null;
 
@@ -249,6 +250,22 @@ function inspect(file) {
 }
 
 const names = Object.keys(SPECS).filter((n) => !only || n === only);
+const VOICE_SECONDS = 150;
+const voiceFile = path.join(OUT, "voice.wav");
+
+function writeManifest() {
+  const files = Object.keys(SPECS).map((n) => `${n}.wav`);
+  if (fs.existsSync(voiceFile)) files.push("voice.wav");
+  fs.mkdirSync(OUT, { recursive: true });
+  fs.writeFileSync(path.join(OUT, "manifest.json"), JSON.stringify({ rate: RATE, files }) + "\n", "utf8");
+  return files;
+}
+
+if (manifestOnly) {
+  const files = writeManifest();
+  console.log(`manifest.json lists ${files.length} files${files.includes("voice.wav") ? ", voice.wav included" : ", no voice.wav yet"}.`);
+  process.exit(0);
+}
 
 if (check) {
   let failures = 0;
@@ -274,6 +291,19 @@ if (check) {
     const db = r.peak > 0 ? (20 * Math.log10(r.peak)).toFixed(1) : "-inf";
     console.log(`${name.padEnd(8)} ${r.seconds.toFixed(3).padStart(7)}  ${String(want).padStart(8)}  ${db.padStart(10)}  ${pass ? "ok" : "FAIL"}`);
   }
+  if (!only && fs.existsSync(voiceFile)) {
+    const r = inspect(voiceFile);
+    if (!r.ok && !r.seconds) {
+      console.log(`${"voice".padEnd(8)} ${r.why}`);
+      process.exit(1);
+    }
+    const dur = Math.abs(r.seconds - VOICE_SECONDS) < 0.005;
+    const clean = r.clipped === 0 && r.peak < 0.9999;
+    const pass = r.ok && dur && clean;
+    if (!pass) failures++;
+    const db = r.peak > 0 ? (20 * Math.log10(r.peak)).toFixed(1) : "-inf";
+    console.log(`${"voice".padEnd(8)} ${r.seconds.toFixed(3).padStart(7)}  ${String(VOICE_SECONDS).padStart(8)}  ${db.padStart(10)}  ${pass ? "ok" : "FAIL"}`);
+  }
   console.log(failures === 0 ? "All audio files present and clean." : `${failures} problem(s).`);
   process.exit(failures === 0 ? 0 : 1);
 }
@@ -285,8 +315,5 @@ for (const name of names) {
   fs.writeFileSync(file, wav);
   console.log(`${name.padEnd(8)} ${(wav.length / 1024).toFixed(0).padStart(7)} KB`);
 }
-if (!only) {
-  const manifest = { rate: RATE, files: Object.keys(SPECS).map((n) => `${n}.wav`) };
-  fs.writeFileSync(path.join(OUT, "manifest.json"), JSON.stringify(manifest) + "\n", "utf8");
-}
+if (!only) writeManifest();
 console.log("Audio written to public/audio/.");

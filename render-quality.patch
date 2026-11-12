@@ -1,0 +1,40 @@
+diff --git a/scripts/render.mjs b/scripts/render.mjs
+index 4888d48..da2681e 100644
+--- a/scripts/render.mjs
++++ b/scripts/render.mjs
+@@ -16,7 +16,7 @@ const val = (name) => {
+ 
+ if (has("--help")) {
+   console.log(
+-    "Usage: node scripts/render.mjs [--4k] [--frames] [--cut30] [--from N --to M] [--allow-sample] [--browser <chrome path>] [--concurrency N]",
++    "Usage: node scripts/render.mjs [--4k] [--frames] [--cut30] [--from N --to M] [--allow-sample] [--browser <chrome path>] [--concurrency N] [--preset <x264 preset>] [--crf N] [--hw] [--bitrate <e.g. 80M>]",
+   );
+   process.exit(0);
+ }
+@@ -65,6 +65,16 @@ const concurrency = val("--concurrency") ? Number(val("--concurrency")) : undefi
+ const scale = has("--4k") ? 2 : 1;
+ const suffix = has("--4k") ? "4k" : "1080p";
+ 
++const PRESETS = ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"];
++const hw = has("--hw");
++const preset = val("--preset") || (has("--4k") ? "slow" : "veryfast");
++const crf = val("--crf") !== undefined ? Number(val("--crf")) : has("--4k") ? 16 : 18;
++const bitrate = val("--bitrate") || (has("--4k") ? "80M" : "25M");
++if (!PRESETS.includes(preset)) fail(`Fix: --preset must be one of ${PRESETS.join(", ")}.`);
++if (!(Number.isFinite(crf) && crf >= 0 && crf <= 51)) fail("Fix: --crf must be a number from 0 to 51.");
++if (!/^\d+(\.\d+)?[kKmM]$/.test(bitrate)) fail("Fix: --bitrate must look like 80M or 25000K.");
++console.log(hw ? `Encoder: NVENC hardware, video bitrate ${bitrate}.` : `Encoder: x264, preset ${preset}, crf ${crf}.`);
++
+ const stamp = () => new Date().toISOString().replace(/[:.]/g, "-");
+ function freeFile(file) {
+   if (fs.existsSync(file)) {
+@@ -109,8 +119,7 @@ const common = {
+   composition,
+   serveUrl,
+   codec: "h264",
+-  crf: 18,
+-  x264Preset: "veryfast",
++  ...(hw ? { hardwareAcceleration: "required", videoBitrate: bitrate } : { crf, x264Preset: preset }),
+   pixelFormat: "yuv420p",
+   colorSpace: "bt709",
+   audioCodec: "aac",

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Audio, Sequence, continueRender, delayRender, staticFile } from "remotion";
 import { FPS } from "../config/timeline";
-import { DRONE_FILE, SFX_CUES, SFX_FILES, SFX_SECONDS, droneGainAt } from "../config/sfx";
+import { DRONE_FILE, SFX_CUES, SFX_FILES, SFX_SECONDS, VOICE_FILE, VOICE_GAIN, droneGainAt } from "../config/sfx";
 
 interface Manifest {
   files: string[];
@@ -35,6 +35,7 @@ export const FilmAudio: React.FC = () => {
   return (
     <>
       {has(DRONE_FILE) ? <Audio src={staticFile(DRONE_FILE)} volume={droneGainAt} /> : null}
+      {has(VOICE_FILE) ? <Audio src={staticFile(VOICE_FILE)} volume={VOICE_GAIN} /> : null}
       {SFX_CUES.filter((c) => has(SFX_FILES[c.name])).map((c, i) => (
         <Sequence key={`${c.name}-${c.frame}-${i}`} from={c.frame} durationInFrames={Math.ceil(SFX_SECONDS[c.name] * FPS) + 2} layout="none">
           <Audio src={staticFile(SFX_FILES[c.name])} volume={c.gain} />

@@ -1,38 +1,38 @@
 {
- "from": "space/spherex-blink",
- "files": 56,
- "megabytes": 9.4,
+ "from": "E:/spherex-blink",
+ "files": 61,
+ "megabytes": 17.9,
  "counts": {
   "font": {
-   "copied": 8,
-   "kept": 0,
+   "copied": 1,
+   "kept": 7,
    "missing": 0
   },
   "tile": {
-   "copied": 13,
-   "kept": 0,
-   "missing": 18
+   "copied": 0,
+   "kept": 31,
+   "missing": 0
   },
   "ref": {
-   "copied": 4,
-   "kept": 0,
+   "copied": 1,
+   "kept": 7,
    "missing": 0
   },
   "meta": {
    "copied": 1,
-   "kept": 0,
+   "kept": 1,
    "missing": 0
   },
   "sky": {
-   "copied": 3,
-   "kept": 0,
+   "copied": 0,
+   "kept": 3,
    "missing": 0
   },
   "planet": {
-   "copied": 9,
-   "kept": 0,
+   "copied": 0,
+   "kept": 9,
    "missing": 0
   }
  },
- "complete": false
+ "complete": true
 }

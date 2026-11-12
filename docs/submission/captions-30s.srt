@@ -1,0 +1,73 @@
+1
+00:00:02,000 --> 00:00:04,000
+Almost everything in the sky
+stands still.
+
+2
+00:00:04,000 --> 00:00:05,000
+Stars stay put
+
+3
+00:00:05,000 --> 00:00:06,000
+Stars stay put
+One dot jumps
+
+4
+00:00:06,000 --> 00:00:07,000
+One dot jumps
+The trick Clyde Tombaugh used
+to find Pluto in 1930.
+
+5
+00:00:07,000 --> 00:00:08,000
+The trick Clyde Tombaugh used
+to find Pluto in 1930.
+
+6
+00:00:08,000 --> 00:00:10,000
+Snaps to the centroid
+
+7
+00:00:11,000 --> 00:00:12,000
+Gone from the other frames
+
+8
+00:00:12,000 --> 00:00:15,000
+Found in the pixels
+
+9
+00:00:16,000 --> 00:00:18,500
+Parallax from Earth's orbit
+
+10
+00:00:21,667 --> 00:00:24,000
+Nearby: asteroid or comet
+
+11
+00:00:24,000 --> 00:00:24,500
+Flag it.
+Cross-matched to known
+
+12
+00:00:24,500 --> 00:00:26,000
+Cross-matched to known
+
+13
+00:00:26,000 --> 00:00:27,000
+SPHEREx Blink Comparator
+Find what moves.
+
+14
+00:00:27,000 --> 00:00:28,000
+SPHEREx Blink Comparator
+Find what moves.
+https://unavailable4u.github.io/spherex-blink/
+https://github.com/Unavailable4u/spherex-blink
+
+15
+00:00:28,000 --> 00:00:30,000
+SPHEREx Blink Comparator
+Find what moves.
+https://unavailable4u.github.io/spherex-blink/
+https://github.com/Unavailable4u/spherex-blink
+Free. Public. One link.

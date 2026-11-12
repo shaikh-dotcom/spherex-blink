@@ -45,6 +45,9 @@ export const SFX_GAIN: Record<SfxName, number> = {
 export const CHIME_NOTE_GAIN = 0.32;
 export const CAPTION_TICK_GAIN = 0.22;
 
+export const VOICE_FILE = "audio/voice.wav";
+export const VOICE_GAIN = 1;
+
 export const DRONE_FILE = "audio/drone.wav";
 export const DRONE_GAIN = 0.35;
 export const DRONE_FADE_FRAMES = 3 * FPS;

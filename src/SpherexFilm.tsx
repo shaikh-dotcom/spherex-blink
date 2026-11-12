@@ -12,6 +12,7 @@ import { Vignette, VIGNETTE_STRENGTH } from "./fx/Vignette";
 import { FilmApp } from "./ui/FilmApp";
 import { FILM_CAMERA, FILM_CURSOR, SCENE_OVERLAYS } from "./scenes";
 import { FilmAudio } from "./audio/FilmAudio";
+import { Subtitles } from "./ui/Subtitles";
 
 const Stage: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { width } = useVideoConfig();
@@ -56,6 +57,7 @@ export const SpherexFilm: React.FC = () => {
         ))}
         <Vignette strength={VIGNETTE_STRENGTH * finish} />
         <Grain opacity={GRAIN_OPACITY * finish} />
+        <Subtitles />
         <FilmAudio />
       </Stage>
     </FontsReady>

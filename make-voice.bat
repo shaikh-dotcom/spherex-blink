@@ -33,6 +33,7 @@ echo.
 echo === 2/3  Telling the film the voice exists ===
 call node scripts\make-sfx.mjs --manifest || goto :fail
 call node scripts\make-sfx.mjs --check || goto :fail
+call node scripts\make-subtitles.mjs || goto :fail
 
 echo.
 echo === 3/3  Render ===
